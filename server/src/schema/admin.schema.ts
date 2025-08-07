@@ -18,7 +18,7 @@ export class ContactInfo {
 }
 
 @Schema()
-export class User extends Document {
+export class Admin extends Document {
   @Prop({ required: true })
   name: string;
 
@@ -32,4 +32,4 @@ export class User extends Document {
   joinDate: Date;
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
+export const AdminSchema = SchemaFactory.createForClass(Admin);
