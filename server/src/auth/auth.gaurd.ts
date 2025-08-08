@@ -2,25 +2,33 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { AuthService } from "./auth.service";
 
 @Injectable()
-export class AuthGaurd implements CanActivate{
-    constructor(private authService : AuthService){}
+export class AuthGaurd implements CanActivate {
+    constructor(private authService: AuthService) { }
 
-    async canActivate(context: ExecutionContext): Promise<boolean>{
+    async canActivate(context: ExecutionContext): Promise<boolean> {
         const req = context.switchToHttp().getRequest<Request>();
         const authHeader = req.headers['authorization'];
 
-        if(!authHeader){
+        if (!authHeader) {
             throw new UnauthorizedException('Invalid token');
         }
 
-        const token = authHeader.split(' ')[1];
-        try{
-            
+        const [type , token] = authHeader.split(' ')[1];
+
+        if (type !== 'Bearer' || !token) {
+            throw new UnauthorizedException('Invalid authorization format');
+        }
+        try {
             const payload = await this.authService.verifyToken(token);
-            req['admin'] = payload;
+            if (payload.isAdmin) {
+                req['admin'] = payload;
+            }
+            else {
+                req['user'] = payload;
+            }
             return true;
 
-        }catch(err){
+        } catch (err) {
             throw new UnauthorizedException('Invalid credentials');
         }
 
