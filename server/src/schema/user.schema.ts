@@ -7,10 +7,13 @@ export type UserDocument = User & Document;
 @Schema()
 export class Permission {
   @Prop({ default: false })
-  allowAdd: boolean;
+  editor: boolean;
+
+  @Prop({ default: true })
+  viewer: boolean;
 
   @Prop({ default: false })
-  write: boolean;
+  allowAdd: boolean;
 }
 
 export const PermissionSchema = SchemaFactory.createForClass(Permission);

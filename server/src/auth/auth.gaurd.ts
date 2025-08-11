@@ -13,9 +13,9 @@ export class AuthGaurd implements CanActivate {
             throw new UnauthorizedException('Invalid token');
         }
 
-        const [type , token] = authHeader.split(' ')[1];
+        const token = authHeader.split(' ')[1];
 
-        if (type !== 'Bearer' || !token) {
+        if (!token) {
             throw new UnauthorizedException('Invalid authorization format');
         }
         try {
