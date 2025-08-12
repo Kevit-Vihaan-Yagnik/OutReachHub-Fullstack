@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Post, Req, UnauthorizedException, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { AuthGaurd } from "src/auth/auth.gaurd";
 import { WorkspaceService } from "./workspace.service";
 import { CreateWorkspaceDto } from "./dto/createWorkspace.dto";
 import { AddMembersDto } from "./dto/add-member.dto";
+import { UpdateWorkspaceDto } from "./dto/updateWorkspace.dto";
 
 @Controller('workspace')
 @UseGuards(AuthGaurd)
@@ -26,6 +27,17 @@ export class WorkspaceController {
     async getWokspacesByID(@Req() req, @Param('id') id: string) {
         await this.workspaceService.validateUsers(req['user'].sub, id);
         return this.workspaceService.getWorkspaceById(id);
+    }
+
+    @Patch(':id')
+    async editWorkspace(
+        @Req() req,
+        @Body() editWorkspaceDto : UpdateWorkspaceDto,
+        @Param('id') workspaceId : string
+    ) {
+        const requester = req.admin|| req.user
+        await this.workspaceService.validateRequesterPermission(requester , workspaceId)
+        return this.workspaceService.editWorkspace(workspaceId , editWorkspaceDto);
     }
 
     @Post(':id/members')
@@ -53,22 +65,22 @@ export class WorkspaceController {
     @Post(':id/tags')
     async addTags(
         @Param('id') workspaceId: string,
-        @Body() body : {tags : string[]},
+        @Body() body: { tags: string[] },
         @Req() req
     ) {
         const requester = req.admin || req.user;
-        await this.workspaceService.validateRequesterPermission(requester , workspaceId);
-        return this.workspaceService.addTags(workspaceId , body.tags);
+        await this.workspaceService.validateRequesterPermission(requester, workspaceId);
+        return this.workspaceService.addTags(workspaceId, body.tags);
     }
 
     @Delete(':id/tags')
     async deleteTags(
         @Param('id') workspaceId: string,
-        @Body() body : {tags : string[]},
+        @Body() body: { tags: string[] },
         @Req() req
     ) {
         const requester = req.admin || req.user;
-        await this.workspaceService.validateRequesterPermission(requester , workspaceId);
-        return this.workspaceService.deleteTags(workspaceId , body.tags);
+        await this.workspaceService.validateRequesterPermission(requester, workspaceId);
+        return this.workspaceService.deleteTags(workspaceId, body.tags);
     }
 }

@@ -6,6 +6,7 @@ import { CreateWorkspaceDto } from "./dto/createWorkspace.dto";
 import { User } from "src/schema/user.schema";
 import { Admin } from "src/schema/admin.schema";
 import { AddMembersDto } from "./dto/add-member.dto";
+import { UpdateWorkspaceDto } from "./dto/updateWorkspace.dto";
 
 @Injectable()
 export class WorkspaceService {
@@ -84,6 +85,16 @@ export class WorkspaceService {
             throw new HttpException('Workspace Id Invalid', 404);
         }
         return workspace;
+    }
+
+    async editWorkspace(id : string , dto : UpdateWorkspaceDto){
+
+        const workspace = await this.WorkspaceModel.findByIdAndUpdate(id , {
+            name : dto.name,
+            description : dto.description,
+        })
+
+        return {message : `name : ${workspace!.name} and description ${workspace?.description} updated`};
     }
 
 
