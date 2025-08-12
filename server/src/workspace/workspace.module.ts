@@ -18,5 +18,6 @@ import { Admin, AdminSchema } from "src/schema/admin.schema";
     ],
     controllers : [WorkspaceController],
     providers : [WorkspaceService ],
+    exports : [WorkspaceService]
 })
 export class WorkspaceModule{}

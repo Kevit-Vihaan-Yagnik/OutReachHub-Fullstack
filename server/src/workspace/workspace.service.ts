@@ -30,6 +30,21 @@ export class WorkspaceService {
         return user;
     }
 
+    async isUserEditor(userId: string, workspaceId: string) {
+        const user = await this.UserModel.findOne({
+            _id: userId,
+            'workspaces.workspaceId': workspaceId,
+            'workspaces.permission.viewer': true,
+            'workspaces.permission.editor': true
+        });
+
+        if (!user) {
+            throw new UnauthorizedException('You are not allowed to add contacts');
+        }
+
+        return user;
+    }
+
     async validateRequesterPermission(requester: any, workspaceId: string) {
         if (requester.isAdmin) {
             const admin = await this.AdminModel.findById(requester.sub);
