@@ -84,4 +84,18 @@ export class ContactService {
             data: contact
         };
     }
+
+    async filterByTags(workspaceId : string , tags : string[]){
+        const workspace = this.WorkspaceModel.findById(workspaceId);
+        
+        if(!workspace){
+            throw new HttpException('Workspace not found', 404);
+        }
+
+        const filteredContacts = await this.ContactModel.find({
+            tags : {$in : tags}
+        })
+
+        return filteredContacts;
+    }
 }

@@ -23,6 +23,16 @@ export class ContactController {
         return this.contactService.createContact(workspaceId, creatContactDto, req['user'].sub);
     }
 
+    @Get('filterTags/:workspaceId')
+    async filterContacts(
+        @Param('workspaceId') workspaceId : string,
+        @Body('tags') tags : string[],
+        @Req() req
+    ){
+        await this.workspaceService.validateUsers(req['user'].sub , workspaceId);
+        return this.contactService.filterByTags(workspaceId,tags)
+    }    
+    
     @Get(':workspaceId')
     async getContactByWorkspace(
         @Param('workspaceId') workspaceId: string,
