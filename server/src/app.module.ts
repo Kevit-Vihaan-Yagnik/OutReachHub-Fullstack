@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { WorkspaceModule } from './workspace/workspace.module';
 import { ContactModule } from './contact/contact.module';
+import { MessageTemplateModule } from './messageTemplate/template.moduel';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { ContactModule } from './contact/contact.module';
     AuthModule,
     WorkspaceModule,
     ContactModule,
+    MessageTemplateModule
   ],
   controllers: [],
   providers: [],

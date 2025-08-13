@@ -57,6 +57,7 @@ export class WorkspaceService {
         const user = await this.UserModel.findOne({
             _id: requester.sub,
             'workspaces.workspaceId': workspaceId,
+            'workspaces.permissions.viewer' : true
         });
 
         if (!user) {
