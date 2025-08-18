@@ -11,7 +11,7 @@ export class Token {
   @Prop({ required: true })
   refreshToken: string;
 
-  @Prop({ default: Date.now   , expires : '7d' })
+  @Prop({ default: Date.now , expires : '7d' })
   createdAt: Date;
 }
 
