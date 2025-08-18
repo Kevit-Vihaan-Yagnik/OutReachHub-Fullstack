@@ -56,11 +56,11 @@ export class MessageTemplateService {
         return {message : `${template?.title} deleted successfuly`}
     }
 
-    async updateTemplate(templateId : string , dto : CreateTemplateDto){
-        const template = await this.MessageTemplateModel.findByIdAndUpdate(templateId , {
-            ...dto
-        },{new : true})
+    // async updateTemplate(templateId : string , dto : CreateTemplateDto){
+    //     const template = await this.MessageTemplateModel.findByIdAndUpdate(templateId , {
+    //         ...dto
+    //     },{new : true})
 
-        return template
-    }
+    //     return template
+    // }
 }

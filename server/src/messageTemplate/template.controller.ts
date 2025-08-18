@@ -41,14 +41,14 @@ export class MessageTemplateController{
         return this.templateService.deleteTemplates(templateId);
     }
 
-    @Patch(':workspaceId/:templateId')
-    async updateTemplate(
-        @Param('templateId') templateId : string,
-        @Param('workspaceId') workspaceId : string, 
-        @Body() templatedto : CreateTemplateDto,
-        @Req() req
-    ){
-        await this.workspaceService.isUserEditor(req['user'].sub , workspaceId);
-        return this.templateService.updateTemplate(templateId, templatedto);
-    }
+    // @Patch(':workspaceId/:templateId')
+    // async updateTemplate(
+    //     @Param('templateId') templateId : string,
+    //     @Param('workspaceId') workspaceId : string, 
+    //     @Body() templatedto : CreateTemplateDto,
+    //     @Req() req
+    // ){
+    //     await this.workspaceService.isUserEditor(req['user'].sub , workspaceId);
+    //     return this.templateService.updateTemplate(templateId, templatedto);
+    // }
 }
