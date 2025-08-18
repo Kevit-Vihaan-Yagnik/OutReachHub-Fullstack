@@ -7,6 +7,7 @@ import { MessageTemplateController } from "./template.controller";
 import { MessageTemplateService } from "./template.service";
 import { AuthModule } from "src/auth/auth.module";
 import { WorkspaceModule } from "src/workspace/workspace.module";
+import { Token, TokenSchema } from "src/schema/token.schema";
 
 @Module({
     imports: [
@@ -14,6 +15,7 @@ import { WorkspaceModule } from "src/workspace/workspace.module";
             { name: Workspace.name, schema: WorkspaceSchema },
             { name: MessageTemplate.name, schema: MessageTemplateSchema },
             {name : User.name , schema : UserSchema},
+            { name: Token.name, schema: TokenSchema },
         ]),
         AuthModule,
         WorkspaceModule

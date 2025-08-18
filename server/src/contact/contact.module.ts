@@ -7,13 +7,15 @@ import { User, UserSchema } from "src/schema/user.schema";
 import { Workspace, WorkspaceSchema } from "src/schema/workspace.schema";
 import { WorkspaceModule } from "src/workspace/workspace.module";
 import { AuthModule } from "src/auth/auth.module";
+import { Token, TokenSchema } from "src/schema/token.schema";
 
 @Module({
     imports: [
         MongooseModule.forFeature([
             {name : Contact.name , schema : ContactSchema},
             {name : User.name , schema : UserSchema},
-            {name : Workspace.name , schema : WorkspaceSchema}
+            {name : Workspace.name , schema : WorkspaceSchema},
+            { name: Token.name, schema: TokenSchema },
         ]),
         WorkspaceModule,
         AuthModule

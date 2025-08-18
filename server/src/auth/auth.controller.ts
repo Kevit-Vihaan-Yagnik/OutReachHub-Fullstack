@@ -1,4 +1,5 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, Post, UseGuards } from "@nestjs/common";
+import { AuthGaurd } from "./auth.gaurd";
 import { CreateAdminDto } from "./dto/createAdmin.dto";
 import { AdminLoginDto } from "./dto/loginAdmin.dto";
 import { AuthService } from "./auth.service";
@@ -27,5 +28,16 @@ export class AuthController{
     @Post('user/login')
     async loginUser(@Body() loginUserDto : LoginUserdto){
         return this.authService.loginUser(loginUserDto);
+    }
+    
+    @Post('user/refresh')
+    async refreshToken(@Body() body: { refreshToken: string }) {
+        return this.authService.refreshAccessToken(body.refreshToken);
+    }
+
+    @Post('user/logout')
+    @UseGuards(AuthGaurd)
+    async logout(@Body() body: { userId: string }) {
+        return this.authService.logout(body.userId);
     }
 }
