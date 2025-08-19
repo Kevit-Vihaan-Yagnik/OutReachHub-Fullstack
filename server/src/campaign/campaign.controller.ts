@@ -13,6 +13,19 @@ export class CampaignController {
         private workspaceService: WorkspaceService,
     ) { }
 
+
+    @Post('demoMail')
+    async mailGone(){
+        return this.campaignService.mailGone();
+    }
+
+    @Post('sendEmail/:id')
+    async sendEmail(
+        @Param('id') campaignId : string 
+    ){
+        return this.campaignService.sendCampaign(campaignId);
+    }
+
     @Post(':workspaceId')
     async createCampaign(
         @Param('workspaceId') workspaceId: string,
@@ -26,6 +39,11 @@ export class CampaignController {
     @Get(":workspaceId")
     async getAllCampaigns(@Param("workspaceId") workspaceId: string) {
         return this.campaignService.getAllCampaigns(workspaceId);
+    }
+
+    @Post(':campaignId/run-now')
+    async runNow(@Param('campaignId') campaignId: string, @Req() req: any) {
+        return this.campaignService.runNow(campaignId, req['user'].sub);
     }
 
     @Get("detail/:id")
@@ -61,4 +79,5 @@ export class CampaignController {
     ) {
         return this.campaignService.getCampaignsByStatus(workspaceId, status);
     }
+
 }   

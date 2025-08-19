@@ -36,6 +36,12 @@ export class Campaign {
   @Prop({ type: Date, required: true })
   endDate: Date;
 
+  @Prop({ type: Number, default: 0 })
+  audienceSize: number;
+
+  @Prop({ type: Date })
+  preparedAt?: Date;
+
   @Prop({ type: Boolean, default: false })
   isDeleted: boolean;
 }
