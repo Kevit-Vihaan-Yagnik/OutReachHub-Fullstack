@@ -1,6 +1,8 @@
 import { useState, createContext } from 'react';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { Router } from './app/router';
+import { Provider } from 'react-redux';
+import { store } from './app/store';
 
 interface ThemeContextType {
   mode: 'dark';
@@ -35,8 +37,10 @@ const App = () => {
   return (
     <ThemeContext.Provider value={{ mode }}>
       <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Router />
+        <Provider store={store}>
+          <CssBaseline />
+          <Router />
+        </Provider>
       </ThemeProvider>
     </ThemeContext.Provider>
   );
