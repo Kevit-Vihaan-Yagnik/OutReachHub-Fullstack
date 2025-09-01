@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import adminAuthReducer from '@/features/auth/slices/adminAuthSlice';
+import adminWorkspaceReducer from '@/features/workspace/slices/workspaceAdminSlice'
 
 export const store = configureStore({
   reducer: {
     adminAuth: adminAuthReducer,
+    adminWorkspace : adminWorkspaceReducer,
   },
 });
 
