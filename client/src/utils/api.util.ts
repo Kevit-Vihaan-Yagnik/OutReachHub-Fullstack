@@ -1,8 +1,11 @@
-import axios, {AxiosError } from 'axios';
-import type { AxiosRequestConfig, AxiosResponse} from 'axios';
+import { store } from '@/app/store';
+import { logout, setTokens } from '@/features/auth/slices/adminAuthSlice';
+import axios, { AxiosError } from 'axios';
+import type { AxiosRequestConfig, AxiosResponse } from 'axios';
+
 
 // Base URL for API (configurable based on environment)
-const BASE_URL = import.meta.env.BASE_URL;
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 // Create an Axios instance
 const api = axios.create({
@@ -15,7 +18,10 @@ const api = axios.create({
 // Add a request interceptor for authentication or other headers (e.g., token)
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token'); // Example: Retrieve token
+
+    const state = store.getState();
+    const token = state.adminAuth.admin?.access_token;
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -23,6 +29,49 @@ api.interceptors.request.use(
   },
   (error: AxiosError) => Promise.reject(error)
 );
+
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error: AxiosError) => {
+    if (error.response?.status === 401) {
+      const state = store.getState();
+      const refreshToken = state.adminAuth.admin?.refresh_token;
+
+      if (refreshToken) {
+        try {
+          const res = await axios.post(`${BASE_URL}/auth/refresh`, {
+            refresh_token: refreshToken,
+          });
+
+          const newAccessToken = res.data.access_token;
+          const newRefreshToken = res.data.refresh_token;
+
+          store.dispatch(
+            setTokens({
+              access_token: newAccessToken,
+              refresh_token: newRefreshToken,
+            })
+          );
+
+          // ✅ Retry original request with new token
+          if (error.config) {
+            error.config.headers.Authorization = `Bearer ${newAccessToken}`;
+            return api.request(error.config);
+          }
+        } catch (refreshErr) {
+          // Refresh failed → logout
+          store.dispatch(logout());
+        }
+      } else {
+        store.dispatch(logout());
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 
 // Generic types for API responses
 export type ApiResponse<T> = T;
@@ -48,9 +97,9 @@ export const post = async <T, B>(url: string, data: B, config?: AxiosRequestConf
 };
 
 // Generic PUT request
-export const put = async <T, B>(url: string, data: B, config?: AxiosRequestConfig): Promise<ApiResponse<T>> => {
+export const patch = async <T, B>(url: string, data: B, config?: AxiosRequestConfig): Promise<ApiResponse<T>> => {
   try {
-    const response: AxiosResponse<ApiResponse<T>> = await api.put(url, data, config);
+    const response: AxiosResponse<ApiResponse<T>> = await api.patch(url, data, config);
     return response.data;
   } catch (error) {
     throw handleError(error);
