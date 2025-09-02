@@ -18,7 +18,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useNavigate } from "react-router-dom";
-import { Workspaces } from "@mui/icons-material";
+import { Contacts } from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
 
@@ -53,11 +53,11 @@ export default function UserDashboardLayout({ children }: Props) {
           </ListItemIcon>
           <ListItemText primary="Dashboard" />
         </ListItemButton>
-        <ListItemButton onClick={() => navigate("/user/dashboard/workspace")}>
+        <ListItemButton onClick={() => navigate("/user/dashboard/contacts")}>
           <ListItemIcon>
-            <Workspaces color="primary" />
+            <Contacts color="primary" />
           </ListItemIcon>
-          <ListItemText primary="Workspace" />
+          <ListItemText primary="Contacts" />
         </ListItemButton>
         <ListItemButton onClick={() => navigate("/user/login")}>
           <ListItemIcon>

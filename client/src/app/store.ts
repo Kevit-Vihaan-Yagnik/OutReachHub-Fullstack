@@ -2,12 +2,14 @@ import { configureStore } from '@reduxjs/toolkit';
 import adminAuthReducer from '@/features/auth/slices/adminAuthSlice';
 import adminWorkspaceReducer from '@/features/workspace/slices/workspaceAdminSlice'
 import userAuthReducer from '@/features/auth-user/slices/userAuthSlice';
+import contactReducer from '@/features/contact/slices/contactSlice';
 
 export const store = configureStore({
   reducer: {
     adminAuth: adminAuthReducer,
     userAuth : userAuthReducer,
     adminWorkspace : adminWorkspaceReducer,
+    contact : contactReducer,
   },
 });
 

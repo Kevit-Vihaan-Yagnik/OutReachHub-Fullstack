@@ -8,6 +8,7 @@ import LoginUser from "@/pages/UserLogin.Page";
 import UserDashboardPage from "@/pages/UserDashboard.Page";
 import UserHome from "@/features/user-dashboard/components/UserHome";
 import WorkspacePicker from "@/features/user-dashboard/components/WorkspacePicker";
+import Contact from "@/features/contact/components/Contact";
 
 const router = createBrowserRouter([
     {path : '/' , element : <Landing/>},
@@ -19,7 +20,8 @@ const router = createBrowserRouter([
     {path: '/user/login' , element : <LoginUser/>},
     {path: '/user/workspace-picker' , element : <WorkspacePicker/>},
     {path: '/user/dashboard' , element : <UserDashboardPage/> , children: [
-        {path : '' , element : <UserHome/>}
+        {path : '' , element : <UserHome/>},
+        {path : 'contacts' , element : <Contact/>}
     ]},
 ])
 

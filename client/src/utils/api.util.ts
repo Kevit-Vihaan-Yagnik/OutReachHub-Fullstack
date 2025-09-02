@@ -47,7 +47,7 @@ api.interceptors.response.use(
       // ---- Handle Admin refresh ----
       if (adminRefresh) {
         try {
-          const res = await axios.post(`${BASE_URL}/auth/refresh`, {
+          const res = await axios.post(`${BASE_URL}/auth/user/refresh`, {
             refresh_token: adminRefresh,
           });
 
@@ -69,7 +69,7 @@ api.interceptors.response.use(
       // ---- Handle User refresh ----
       else if (userRefresh) {
         try {
-          const res = await axios.post(`${BASE_URL}/auth/refresh`, {
+          const res = await axios.post(`${BASE_URL}/auth/user/refresh`, {
             refresh_token: userRefresh,
           });
 
