@@ -4,6 +4,7 @@ import LoginAdmin from "@/pages/AdminLogin.Page";
 import DashboardPage from "@/pages/Dashboard.Page";
 import Home from "@/features/admin-dashboard/components/Home";
 import Workspace from "@/features/workspace/components/Workspace";
+import LoginUser from "@/pages/UserLogin.Page";
 
 const router = createBrowserRouter([
     {path : '/' , element : <Landing/>},
@@ -12,6 +13,7 @@ const router = createBrowserRouter([
         {path : '' , element: <Home/>},
         {path : 'workspace' , element : <Workspace/>}
     ]},
+    {path: '/user/login' , element : <LoginUser/>}
 ])
 
 export function Router(){
