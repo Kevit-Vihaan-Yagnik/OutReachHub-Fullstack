@@ -1,4 +1,5 @@
 import { store } from '@/app/store';
+import { userLogout, userSetTokens } from '@/features/auth-user/slices/userAuthSlice';
 import { logout, setTokens } from '@/features/auth/slices/adminAuthSlice';
 import axios, { AxiosError } from 'axios';
 import type { AxiosRequestConfig, AxiosResponse } from 'axios';
@@ -18,53 +19,79 @@ const api = axios.create({
 // Add a request interceptor for authentication or other headers (e.g., token)
 api.interceptors.request.use(
   (config) => {
-
     const state = store.getState();
-    const token = state.adminAuth.admin?.access_token;
+    const adminToken = state.adminAuth.admin?.access_token;
+    const userToken = state.userAuth.user?.access_token;
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    if (adminToken) {
+      config.headers.Authorization = `Bearer ${adminToken}`;
+    } else if (userToken) {
+      config.headers.Authorization = `Bearer ${userToken}`;
     }
+
     return config;
   },
   (error: AxiosError) => Promise.reject(error)
 );
 
-
+// ✅ Response interceptor → handle token refresh for both admin & user
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     if (error.response?.status === 401) {
       const state = store.getState();
-      const refreshToken = state.adminAuth.admin?.refresh_token;
 
-      if (refreshToken) {
+      const adminRefresh = state.adminAuth.admin?.refresh_token;
+      const userRefresh = state.userAuth.user?.refresh_token;
+
+      // ---- Handle Admin refresh ----
+      if (adminRefresh) {
         try {
           const res = await axios.post(`${BASE_URL}/auth/refresh`, {
-            refresh_token: refreshToken,
+            refresh_token: adminRefresh,
           });
 
-          const newAccessToken = res.data.access_token;
-          const newRefreshToken = res.data.refresh_token;
+          const { access_token, refresh_token } = res.data;
 
           store.dispatch(
-            setTokens({
-              access_token: newAccessToken,
-              refresh_token: newRefreshToken,
-            })
+            setTokens({ access_token, refresh_token })
           );
 
-          // ✅ Retry original request with new token
           if (error.config) {
-            error.config.headers.Authorization = `Bearer ${newAccessToken}`;
+            error.config.headers.Authorization = `Bearer ${access_token}`;
             return api.request(error.config);
           }
-        } catch (refreshErr) {
-          // Refresh failed → logout
+        } catch {
           store.dispatch(logout());
         }
-      } else {
+      }
+
+      // ---- Handle User refresh ----
+      else if (userRefresh) {
+        try {
+          const res = await axios.post(`${BASE_URL}/auth/refresh`, {
+            refresh_token: userRefresh,
+          });
+
+          const { access_token, refresh_token } = res.data;
+
+          store.dispatch(
+            userSetTokens({ access_token, refresh_token })
+          );
+
+          if (error.config) {
+            error.config.headers.Authorization = `Bearer ${access_token}`;
+            return api.request(error.config);
+          }
+        } catch {
+          store.dispatch(userLogout());
+        }
+      }
+
+      // No refresh token → force logout
+      else {
         store.dispatch(logout());
+        store.dispatch(userLogout());
       }
     }
 

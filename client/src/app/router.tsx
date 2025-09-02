@@ -5,6 +5,9 @@ import DashboardPage from "@/pages/Dashboard.Page";
 import Home from "@/features/admin-dashboard/components/Home";
 import Workspace from "@/features/workspace/components/Workspace";
 import LoginUser from "@/pages/UserLogin.Page";
+import UserDashboardPage from "@/pages/UserDashboard.Page";
+import UserHome from "@/features/user-dashboard/components/UserHome";
+import WorkspacePicker from "@/features/user-dashboard/components/WorkspacePicker";
 
 const router = createBrowserRouter([
     {path : '/' , element : <Landing/>},
@@ -13,7 +16,11 @@ const router = createBrowserRouter([
         {path : '' , element: <Home/>},
         {path : 'workspace' , element : <Workspace/>}
     ]},
-    {path: '/user/login' , element : <LoginUser/>}
+    {path: '/user/login' , element : <LoginUser/>},
+    {path: '/user/workspace-picker' , element : <WorkspacePicker/>},
+    {path: '/user/dashboard' , element : <UserDashboardPage/> , children: [
+        {path : '' , element : <UserHome/>}
+    ]},
 ])
 
 export function Router(){

@@ -1,12 +1,15 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { IUserResponse } from "../types";
+import type { ICurrentWorkspace } from "@/features/user-dashboard/types";
 
 type UserAuthState = {
     user: IUserResponse | null;
+    currentWorkspace : ICurrentWorkspace | null;
 }
 
 const initialState: UserAuthState = {
-    user: JSON.parse(localStorage.getItem('userAuth') || 'null')
+    user: JSON.parse(localStorage.getItem('userAuth') || 'null'),
+    currentWorkspace: JSON.parse(localStorage.getItem("currentWorkspace") || "null"),
 };
 
 const userAuthSlice = createSlice({
@@ -33,8 +36,16 @@ const userAuthSlice = createSlice({
                 localStorage.setItem('userAuth', JSON.stringify(state.user));
             }
         },
+        setCurrentWorkspace: (state, action: PayloadAction<ICurrentWorkspace | null>) => {
+            state.currentWorkspace = action.payload;
+            if (action.payload) {
+                localStorage.setItem("currentWorkspace", JSON.stringify(action.payload));
+            } else {
+                localStorage.removeItem("currentWorkspace");
+            }
+        },
     }
 })
 
-export const { userLogin, userLogout, userSetTokens } = userAuthSlice.actions;
+export const { userLogin, userLogout, userSetTokens , setCurrentWorkspace } = userAuthSlice.actions;
 export default userAuthSlice.reducer;

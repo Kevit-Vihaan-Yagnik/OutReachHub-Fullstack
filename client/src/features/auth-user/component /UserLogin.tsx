@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { schema, type ILoginFormData } from '../types';
 import { userLogin } from '../slices/userAuthSlice';
 import { userLoginApi } from '../service/userAuth.service';
@@ -13,7 +13,7 @@ const UserLogin = () => {
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [errorSnackbar, setErrorSnackbar] = useState(false);
     const dispatch = useDispatch();
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
 
     const {
         register,
@@ -42,7 +42,7 @@ const UserLogin = () => {
             );
             console.log('response from api : ' + res)
             setOpenSnackbar(true);
-            // navigate('/user/dashboard')
+            navigate('/user/workspace-picker')
         } catch (error) {
             console.error('Login failed:', error);
             setErrorSnackbar(true)
