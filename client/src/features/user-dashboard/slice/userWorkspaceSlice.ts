@@ -1,6 +1,9 @@
 // features/workspace/slices/workspaceUserSlice.ts
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { type IWorkspace, type IWorkspaceUser } from "@/features/workspace/types";
+import {
+  type IWorkspace,
+  type IWorkspaceUser,
+} from "@/features/workspace/types";
 
 export interface WorkspaceUserState {
   current: IWorkspace | null;
@@ -10,13 +13,17 @@ export interface WorkspaceUserState {
   error: string | null;
 }
 
-const initialState: WorkspaceUserState = {
-  current: null,
-  tags: [],
-  users: [],
-  loading: false,
-  error: null,
-};
+const persisted = localStorage.getItem("userWorkspace");
+
+const initialState: WorkspaceUserState = persisted
+  ? { ...JSON.parse(persisted), loading: false, error: null }
+  : {
+      current: null,
+      tags: [],
+      users: [],
+      loading: false,
+      error: null,
+    };
 
 const workspaceUserSlice = createSlice({
   name: "workspaceUser",
@@ -39,6 +46,16 @@ const workspaceUserSlice = createSlice({
             return { id: userObj._id, name: userObj.name };
           })
           .filter(Boolean) || [];
+
+      // ✅ Persist to localStorage
+      localStorage.setItem(
+        "userWorkspace",
+        JSON.stringify({
+          current: state.current,
+          tags: state.tags,
+          users: state.users,
+        })
+      );
     },
     clearUserWorkspace: (state) => {
       state.current = null;
@@ -46,6 +63,8 @@ const workspaceUserSlice = createSlice({
       state.users = [];
       state.loading = false;
       state.error = null;
+
+      localStorage.removeItem("userWorkspace");
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
