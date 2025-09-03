@@ -29,16 +29,19 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   addContactToWorkspace,
   getContactsByWorkspace,
+  updateContactApi,
 } from "../service/contact.service";
 import {
   setContacts,
   setLoading,
   setError,
   addContact,
+  updateContact,
 } from "../slices/contactSlice";
 import type { IContact, IContactFormData } from "../types";
-import AddContactModal from "./AddContactModal";
+import AddContactModal from "./AddEditContactModal";
 import ViewContactModal from "./ViewContactModal";
+import ContactFormModal from "./AddEditContactModal";
 
 export default function Contact() {
   const theme = useTheme();
@@ -62,8 +65,10 @@ export default function Contact() {
   const [selectedContactId, setSelectedContactId] = useState<string | null>(
     null
   );
+  const [selectedContact, setSelectedContact] = useState<IContact | null>(null);
   const [openAdd, setOpenAdd] = useState(false);
   const [openView, setOpenView] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [menuRow, setMenuRow] = useState<IContact | null>(null);
@@ -135,6 +140,34 @@ export default function Contact() {
         message: "Contact already exists",
         severity: "error",
       });
+    }
+  };
+
+  const handleEditContact = async (data: IContactFormData) => {
+    if (!selectedContact) return;
+
+    try {
+      if (!workspaceId) return;
+      const updated = await updateContactApi(
+        workspaceId,
+        selectedContact._id,
+        data
+      );
+
+      dispatch(updateContact(updated)); // 👈 you'll need an `updateContactInState` reducer in your slice
+      setSnackbar({
+        open: true,
+        message: "Contact updated successfully!",
+        severity: "success",
+      });
+    } catch (err) {
+      setSnackbar({
+        open: true,
+        message: "Failed to update contact",
+        severity: "error",
+      });
+    } finally {
+      setOpenEdit(false);
     }
   };
 
@@ -281,7 +314,17 @@ export default function Contact() {
         >
           View
         </MenuItem>
-        <MenuItem onClick={handleMenuClose}>Edit</MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (menuRow) {
+              setSelectedContact(menuRow); 
+              setOpenEdit(true); 
+            }
+            handleMenuClose();
+          }}
+        >
+          Edit
+        </MenuItem>
         <MenuItem onClick={handleMenuClose}>Delete</MenuItem>
       </Menu>
 
@@ -300,6 +343,14 @@ export default function Contact() {
         open={openView}
         onClose={() => setOpenView(false)}
         contactId={selectedContactId}
+      />
+
+      <ContactFormModal
+        open={openEdit}
+        onClose={() => setOpenEdit(false)}
+        onSubmit={handleEditContact}
+        availableTags={tags}
+        initialData={selectedContact ?? undefined}
       />
 
       {/* Snackbar */}
