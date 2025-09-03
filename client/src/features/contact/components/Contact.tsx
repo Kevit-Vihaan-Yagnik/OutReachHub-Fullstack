@@ -26,13 +26,13 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useEffect, useState } from "react";
 import type { RootState } from "@/app/store";
 import { useDispatch, useSelector } from "react-redux";
-import { getContactsByWorkspace } from "../service/contact.service";
 import {
-  setContacts,
-  setLoading,
-  setError,
-} from "../slices/contactSlice";
-import type { IContact } from "../types";
+  addContactToWorkspace,
+  getContactsByWorkspace,
+} from "../service/contact.service";
+import { setContacts, setLoading, setError, addContact } from "../slices/contactSlice";
+import type { IContact, IContactFormData } from "../types";
+import AddContactModal from "./AddContactModal";
 
 export default function Contact() {
   const theme = useTheme();
@@ -46,10 +46,14 @@ export default function Contact() {
     (state: RootState) => state.contact
   );
 
+  //🔹 Workspace tags from Redux
+  const tags = useSelector((state: RootState) => state.userWorkspace.tags);
+
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredRows, setFilteredRows] = useState<IContact[]>([]);
+  const [open, setOpen] = useState(false);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [menuRow, setMenuRow] = useState<IContact | null>(null);
@@ -103,6 +107,27 @@ export default function Contact() {
     setMenuRow(null);
   };
 
+  const handleAddContact = async (data: IContactFormData) => {
+    if (!workspaceId) return;
+
+    try {
+      const newContact = await addContactToWorkspace(workspaceId, data);
+      dispatch(addContact(newContact));
+      setSnackbar({
+        open: true,
+        message: "Contact added successfully!",
+        severity: "success",
+      });
+    } catch (err) {
+      console.error("❌ Failed to add contact:", err);
+      setSnackbar({
+        open: true,
+        message: "Failed to add contact",
+        severity: "error",
+      });
+    }
+  };
+
   const visibleRows = filteredRows.length ? filteredRows : contacts;
 
   return (
@@ -146,7 +171,11 @@ export default function Contact() {
           >
             Search
           </Button>
-          <Button variant="contained" sx={{ ml: 2 }}>
+          <Button
+            variant="contained"
+            sx={{ ml: 2 }}
+            onClick={() => setOpen(true)}
+          >
             Add +
           </Button>
         </Grid>
@@ -235,6 +264,13 @@ export default function Contact() {
         <MenuItem onClick={handleMenuClose}>Edit</MenuItem>
         <MenuItem onClick={handleMenuClose}>Delete</MenuItem>
       </Menu>
+
+      <AddContactModal
+        open={open}
+        onClose={() => setOpen(false)}
+        onSubmit={(data) =>{console.log(data), handleAddContact(data)}}
+        availableTags={tags}
+      />
 
       {/* Snackbar */}
       <Snackbar

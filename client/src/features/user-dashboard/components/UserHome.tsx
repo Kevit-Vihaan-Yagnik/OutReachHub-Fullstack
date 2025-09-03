@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@mui/material";
 import { useEffect, useState, useMemo } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { type RootState } from "@/app/store";
 import { getWorkspaceById } from "@/features/workspace/service/workspace.service";
 import { getCampaignsByWorkspace } from "@/features/campaign/service/campaign.service";
@@ -33,11 +33,13 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+import { setUserWorkspace } from "../slice/userWorkspaceSlice";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#9333EA"];
 
 export default function UserDashboard() {
   const theme = useTheme();
+  const dispatch = useDispatch();
   const currentWorkspace = useSelector(
     (state: RootState) => state.userAuth.currentWorkspace
   );
@@ -59,6 +61,8 @@ export default function UserDashboard() {
         setWorkspace(ws);
         setCampaigns(cmps);
         setContacts(cts);
+
+        dispatch(setUserWorkspace(ws));
       } catch (err) {
         console.error("Error fetching dashboard data", err);
       } finally {
