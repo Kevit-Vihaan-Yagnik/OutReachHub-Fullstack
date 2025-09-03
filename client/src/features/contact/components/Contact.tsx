@@ -30,9 +30,15 @@ import {
   addContactToWorkspace,
   getContactsByWorkspace,
 } from "../service/contact.service";
-import { setContacts, setLoading, setError, addContact } from "../slices/contactSlice";
+import {
+  setContacts,
+  setLoading,
+  setError,
+  addContact,
+} from "../slices/contactSlice";
 import type { IContact, IContactFormData } from "../types";
 import AddContactModal from "./AddContactModal";
+import ViewContactModal from "./ViewContactModal";
 
 export default function Contact() {
   const theme = useTheme();
@@ -53,7 +59,11 @@ export default function Contact() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredRows, setFilteredRows] = useState<IContact[]>([]);
-  const [open, setOpen] = useState(false);
+  const [selectedContactId, setSelectedContactId] = useState<string | null>(
+    null
+  );
+  const [openAdd, setOpenAdd] = useState(false);
+  const [openView, setOpenView] = useState(false);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [menuRow, setMenuRow] = useState<IContact | null>(null);
@@ -122,7 +132,7 @@ export default function Contact() {
       console.error("❌ Failed to add contact:", err);
       setSnackbar({
         open: true,
-        message: "Failed to add contact",
+        message: "Contact already exists",
         severity: "error",
       });
     }
@@ -174,7 +184,7 @@ export default function Contact() {
           <Button
             variant="contained"
             sx={{ ml: 2 }}
-            onClick={() => setOpen(true)}
+            onClick={() => setOpenAdd(true)}
           >
             Add +
           </Button>
@@ -260,16 +270,36 @@ export default function Contact() {
 
       {/* Action Menu */}
       <Menu anchorEl={anchorEl} open={openMenu} onClose={handleMenuClose}>
-        <MenuItem onClick={handleMenuClose}>View</MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (menuRow) {
+              setSelectedContactId(menuRow._id);
+              setOpenView(true);
+            }
+            handleMenuClose();
+          }}
+        >
+          View
+        </MenuItem>
         <MenuItem onClick={handleMenuClose}>Edit</MenuItem>
         <MenuItem onClick={handleMenuClose}>Delete</MenuItem>
       </Menu>
 
+      {/* Modals */}
+
       <AddContactModal
-        open={open}
-        onClose={() => setOpen(false)}
-        onSubmit={(data) =>{console.log(data), handleAddContact(data)}}
+        open={openAdd}
+        onClose={() => setOpenAdd(false)}
+        onSubmit={(data) => {
+          handleAddContact(data);
+        }}
         availableTags={tags}
+      />
+
+      <ViewContactModal
+        open={openView}
+        onClose={() => setOpenView(false)}
+        contactId={selectedContactId}
       />
 
       {/* Snackbar */}

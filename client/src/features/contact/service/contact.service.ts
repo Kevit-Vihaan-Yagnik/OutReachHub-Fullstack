@@ -36,3 +36,8 @@ export const addContactToWorkspace = async (
 
   return res.data[0];
 };
+
+export const getContactById = async (workspaceId : string , contactId: string): Promise<IContact> => {
+  const res: { message: string; data: IContact } = await get(`/contact/${workspaceId}/${contactId}`);
+  return res.data;
+};
