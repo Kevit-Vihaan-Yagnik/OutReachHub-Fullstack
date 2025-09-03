@@ -28,6 +28,7 @@ import type { RootState } from "@/app/store";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addContactToWorkspace,
+  deleteContactApi,
   getContactsByWorkspace,
   updateContactApi,
 } from "../service/contact.service";
@@ -37,11 +38,13 @@ import {
   setError,
   addContact,
   updateContact,
+  deleteContact,
 } from "../slices/contactSlice";
 import type { IContact, IContactFormData } from "../types";
 import AddContactModal from "./AddEditContactModal";
 import ViewContactModal from "./ViewContactModal";
 import ContactFormModal from "./AddEditContactModal";
+import DeleteConfirmDialog from "./DeleteContactDialog";
 
 export default function Contact() {
   const theme = useTheme();
@@ -69,6 +72,7 @@ export default function Contact() {
   const [openAdd, setOpenAdd] = useState(false);
   const [openView, setOpenView] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [menuRow, setMenuRow] = useState<IContact | null>(null);
@@ -168,6 +172,30 @@ export default function Contact() {
       });
     } finally {
       setOpenEdit(false);
+    }
+  };
+
+  const handleDeleteContact = async () => {
+    if (!workspaceId || !selectedContact) return;
+
+    try {
+      const message = await deleteContactApi(workspaceId, selectedContact._id);
+      dispatch(deleteContact(selectedContact._id));
+
+      setSnackbar({
+        open: true,
+        message,
+        severity: "success",
+      });
+    } catch (err) {
+      setSnackbar({
+        open: true,
+        message: "Failed to delete contact",
+        severity: "error",
+      });
+    } finally {
+      setOpenDelete(false);
+      setSelectedContact(null);
     }
   };
 
@@ -317,15 +345,25 @@ export default function Contact() {
         <MenuItem
           onClick={() => {
             if (menuRow) {
-              setSelectedContact(menuRow); 
-              setOpenEdit(true); 
+              setSelectedContact(menuRow);
+              setOpenEdit(true);
             }
             handleMenuClose();
           }}
         >
           Edit
         </MenuItem>
-        <MenuItem onClick={handleMenuClose}>Delete</MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (menuRow) {
+              setSelectedContact(menuRow);
+              setOpenDelete(true);
+            }
+            handleMenuClose();
+          }}
+        >
+          Delete
+        </MenuItem>
       </Menu>
 
       {/* Modals */}
@@ -351,6 +389,13 @@ export default function Contact() {
         onSubmit={handleEditContact}
         availableTags={tags}
         initialData={selectedContact ?? undefined}
+      />
+
+      <DeleteConfirmDialog
+        open={openDelete}
+        onClose={() => setOpenDelete(false)}
+        onConfirm={handleDeleteContact}
+        contactName={selectedContact?.name}
       />
 
       {/* Snackbar */}

@@ -1,4 +1,4 @@
-import { get, patch, post } from "@/utils/api.util";
+import { del, get, patch, post } from "@/utils/api.util";
 import type { IContact, IContactFormData, IContactResponse } from "../types";
 
 export const getContactsByWorkspace = async (
@@ -68,3 +68,8 @@ export const updateContactApi = async (
 
   return res.data;
 };
+
+export const deleteContactApi = async(workspaceId : string , contactId : string) : Promise<string> => {
+  const res : {message: string , data : IContact} = await del(`/contact/${workspaceId}/${contactId}`);
+  return res.message
+}
