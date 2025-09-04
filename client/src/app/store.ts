@@ -3,7 +3,8 @@ import adminAuthReducer from '@/features/auth/slices/adminAuthSlice';
 import adminWorkspaceReducer from '@/features/workspace/slices/workspaceAdminSlice'
 import userAuthReducer from '@/features/auth-user/slices/userAuthSlice';
 import contactReducer from '@/features/contact/slices/contactSlice';
-import userWorkspaceReducer from '@/features/user-dashboard/slice/userWorkspaceSlice'
+import userWorkspaceReducer from '@/features/user-dashboard/slice/userWorkspaceSlice';
+import messageTemplateReducer from '@/features/message-template/slices/messageTemplateSlice';
 
 export const store = configureStore({
   reducer: {
@@ -11,7 +12,8 @@ export const store = configureStore({
     userAuth : userAuthReducer,
     adminWorkspace : adminWorkspaceReducer,
     contact : contactReducer,
-    userWorkspace : userWorkspaceReducer
+    userWorkspace : userWorkspaceReducer,
+    messageTemplate : messageTemplateReducer,
   },
 });
 

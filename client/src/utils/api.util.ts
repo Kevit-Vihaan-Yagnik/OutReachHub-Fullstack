@@ -1,9 +1,11 @@
-import { store } from '@/app/store';
-import { userLogout, userSetTokens } from '@/features/auth-user/slices/userAuthSlice';
-import { logout, setTokens } from '@/features/auth/slices/adminAuthSlice';
-import axios, { AxiosError } from 'axios';
-import type { AxiosRequestConfig, AxiosResponse } from 'axios';
-
+import { store } from "@/app/store";
+import {
+  userLogout,
+  userSetTokens,
+} from "@/features/auth-user/slices/userAuthSlice";
+import { logout, setTokens } from "@/features/auth/slices/adminAuthSlice";
+import axios, { AxiosError } from "axios";
+import type { AxiosRequestConfig, AxiosResponse } from "axios";
 
 // Base URL for API (configurable based on environment)
 const BASE_URL = import.meta.env.VITE_API_URL;
@@ -12,7 +14,7 @@ const BASE_URL = import.meta.env.VITE_API_URL;
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
@@ -53,9 +55,7 @@ api.interceptors.response.use(
 
           const { access_token, refresh_token } = res.data;
 
-          store.dispatch(
-            setTokens({ access_token, refresh_token })
-          );
+          store.dispatch(setTokens({ access_token, refresh_token }));
 
           if (error.config) {
             error.config.headers.Authorization = `Bearer ${access_token}`;
@@ -69,15 +69,13 @@ api.interceptors.response.use(
       // ---- Handle User refresh ----
       else if (userRefresh) {
         try {
-          const res = await axios.post(`${BASE_URL}/auth/user/refresh`, {
-            refresh_token: userRefresh,
+          const res : { access_token : string, refresh_token : string }  = await axios.post(`${BASE_URL}/auth/user/refresh`, {
+            refreshToken: userRefresh,
           });
 
-          const { access_token, refresh_token } = res.data;
+          const { access_token, refresh_token } = res;
 
-          store.dispatch(
-            userSetTokens({ access_token, refresh_token })
-          );
+          store.dispatch(userSetTokens({ access_token, refresh_token }));
 
           if (error.config) {
             error.config.headers.Authorization = `Bearer ${access_token}`;
@@ -99,12 +97,14 @@ api.interceptors.response.use(
   }
 );
 
-
 // Generic types for API responses
 export type ApiResponse<T> = T;
 
 // Generic GET request
-export const get = async <T>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> => {
+export const get = async <T>(
+  url: string,
+  config?: AxiosRequestConfig
+): Promise<ApiResponse<T>> => {
   try {
     const response: AxiosResponse<ApiResponse<T>> = await api.get(url, config);
     return response.data;
@@ -114,9 +114,17 @@ export const get = async <T>(url: string, config?: AxiosRequestConfig): Promise<
 };
 
 // Generic POST request
-export const post = async <T, B>(url: string, data: B, config?: AxiosRequestConfig): Promise<ApiResponse<T>> => {
+export const post = async <T, B>(
+  url: string,
+  data: B,
+  config?: AxiosRequestConfig
+): Promise<ApiResponse<T>> => {
   try {
-    const response: AxiosResponse<ApiResponse<T>> = await api.post(url, data, config);
+    const response: AxiosResponse<ApiResponse<T>> = await api.post(
+      url,
+      data,
+      config
+    );
     return response.data;
   } catch (error) {
     throw handleError(error);
@@ -124,9 +132,17 @@ export const post = async <T, B>(url: string, data: B, config?: AxiosRequestConf
 };
 
 // Generic PUT request
-export const patch = async <T, B>(url: string, data: B, config?: AxiosRequestConfig): Promise<ApiResponse<T>> => {
+export const patch = async <T, B>(
+  url: string,
+  data: B,
+  config?: AxiosRequestConfig
+): Promise<ApiResponse<T>> => {
   try {
-    const response: AxiosResponse<ApiResponse<T>> = await api.patch(url, data, config);
+    const response: AxiosResponse<ApiResponse<T>> = await api.patch(
+      url,
+      data,
+      config
+    );
     return response.data;
   } catch (error) {
     throw handleError(error);
@@ -134,9 +150,15 @@ export const patch = async <T, B>(url: string, data: B, config?: AxiosRequestCon
 };
 
 // Generic DELETE request
-export const del = async <T>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> => {
+export const del = async <T>(
+  url: string,
+  config?: AxiosRequestConfig
+): Promise<ApiResponse<T>> => {
   try {
-    const response: AxiosResponse<ApiResponse<T>> = await api.delete(url, config);
+    const response: AxiosResponse<ApiResponse<T>> = await api.delete(
+      url,
+      config
+    );
     return response.data;
   } catch (error) {
     throw handleError(error);
@@ -147,7 +169,7 @@ export const del = async <T>(url: string, config?: AxiosRequestConfig): Promise<
 const handleError = (error: unknown): Error => {
   if (axios.isAxiosError(error)) {
     const axiosError = error as AxiosError;
-    return new Error(axiosError.message || 'An error occurred');
+    return new Error(axiosError.message || "An error occurred");
   }
-  return new Error('An unexpected error occurred');
+  return new Error("An unexpected error occurred");
 };
