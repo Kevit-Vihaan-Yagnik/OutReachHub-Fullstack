@@ -17,17 +17,24 @@ import {
 } from "@mui/material";
 import { useState, useMemo, useEffect } from "react";
 import Masonry from "@mui/lab/Masonry";
-import { createMessageTemplate, getMessageTemplatesApi } from "../service/messageTemplate.service";
+import {
+  createMessageTemplate,
+  deleteMessageTemplateApi,
+  getMessageTemplatesApi,
+} from "../service/messageTemplate.service";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
 import {
   addMessageTemplate,
+  deleteMessageTemplate,
   setError,
   setLoading,
   setMessageTemplate,
 } from "../slices/messageTemplateSlice";
 import AddTemplateModal from "./AddTemplate";
-import type { ITemplateFormData } from "../types";
+import type { IMessageTemplate, ITemplateFormData } from "../types";
+import ViewTemplateModal from "./ViewTemplateModal";
+import DeleteTemplateModal from "./DeleteTemplateModal";
 
 export default function MessageTemplate() {
   const theme = useTheme();
@@ -39,12 +46,21 @@ export default function MessageTemplate() {
     (state: RootState) => state.userAuth.currentWorkspace?.id
   );
 
-  const [openAdd, setOpenAdd] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success" as "success" | "error",
   });
+  const [openAdd, setOpenAdd] = useState(false);
+
+  const [viewOpen, setViewOpen] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] =
+    useState<IMessageTemplate | null>(null);
+
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteTemplate, setDeleteTemplate] = useState<IMessageTemplate | null>(
+    null
+  );
 
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<"all" | "text" | "text-image">(
@@ -73,6 +89,30 @@ export default function MessageTemplate() {
         message: "Failed to add template",
         severity: "error",
       });
+    }
+  };
+
+  const handleDeleteTemplate = async (templateId: string) => {
+    if (!workspaceId) return;
+
+    try {
+      await deleteMessageTemplateApi(workspaceId, templateId);
+      dispatch(deleteMessageTemplate(templateId)); // ✅ create this reducer in slice
+      setSnackbar({
+        open: true,
+        message: "Template deleted successfully!",
+        severity: "success",
+      });
+    } catch (err) {
+      console.error("❌ Failed to delete template:", err);
+      setSnackbar({
+        open: true,
+        message: "Failed to delete template",
+        severity: "error",
+      });
+    } finally {
+      setDeleteOpen(false);
+      setDeleteTemplate(null);
     }
   };
 
@@ -209,10 +249,24 @@ export default function MessageTemplate() {
               </Typography>
             </CardContent>
             <CardActions>
-              <Button size="small" color="primary">
+              <Button
+                size="small"
+                color="primary"
+                onClick={() => {
+                  setSelectedTemplate(template);
+                  setViewOpen(true);
+                }}
+              >
                 View
               </Button>
-              <Button size="small" color="error">
+              <Button
+                size="small"
+                color="error"
+                onClick={() => {
+                  setDeleteTemplate(template);
+                  setDeleteOpen(true);
+                }}
+              >
                 Delete
               </Button>
             </CardActions>
@@ -235,6 +289,19 @@ export default function MessageTemplate() {
         open={openAdd}
         onClose={() => setOpenAdd(false)}
         onSubmit={handleAddTemplate}
+      />
+
+      <ViewTemplateModal
+        open={viewOpen}
+        onClose={() => setViewOpen(false)}
+        template={selectedTemplate}
+      />
+
+      <DeleteTemplateModal
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        template={deleteTemplate}
+        onConfirm={handleDeleteTemplate}
       />
 
       {/* Snackbar */}
