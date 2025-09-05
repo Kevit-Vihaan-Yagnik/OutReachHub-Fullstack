@@ -12,17 +12,22 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Pagination,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { useState, useMemo, useEffect } from "react";
 import Masonry from "@mui/lab/Masonry";
-import { getMessageTemplatesApi } from "../service/messageTemplate.service";
+import { createMessageTemplate, getMessageTemplatesApi } from "../service/messageTemplate.service";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
 import {
+  addMessageTemplate,
   setError,
   setLoading,
   setMessageTemplate,
 } from "../slices/messageTemplateSlice";
+import AddTemplateModal from "./AddTemplate";
+import type { ITemplateFormData } from "../types";
 
 export default function MessageTemplate() {
   const theme = useTheme();
@@ -34,6 +39,13 @@ export default function MessageTemplate() {
     (state: RootState) => state.userAuth.currentWorkspace?.id
   );
 
+  const [openAdd, setOpenAdd] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success" as "success" | "error",
+  });
+
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<"all" | "text" | "text-image">(
     "all"
@@ -41,7 +53,28 @@ export default function MessageTemplate() {
 
   // pagination state
   const [page, setPage] = useState(1);
-  const limit = 6; // templates per page
+  const limit = 9; // templates per page
+
+  const handleAddTemplate = async (data: ITemplateFormData) => {
+    if (!workspaceId) return;
+
+    try {
+      const newTemplate = await createMessageTemplate(workspaceId, data);
+      dispatch(addMessageTemplate(newTemplate));
+      setSnackbar({
+        open: true,
+        message: "Template added successfully!",
+        severity: "success",
+      });
+    } catch (err) {
+      console.error("❌ Failed to add template:", err);
+      setSnackbar({
+        open: true,
+        message: "Failed to add template",
+        severity: "error",
+      });
+    }
+  };
 
   // 🔹 Fetch messageTemplates once
   useEffect(() => {
@@ -103,7 +136,11 @@ export default function MessageTemplate() {
         <Typography variant="h4" fontWeight={700} color="primary">
           Message Templates
         </Typography>
-        <Button variant="contained" color="primary">
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => setOpenAdd(true)}
+        >
           Add Template +
         </Button>
       </Box>
@@ -192,6 +229,29 @@ export default function MessageTemplate() {
           </Typography>
         )}
       </Masonry>
+
+      {/* Modals */}
+      <AddTemplateModal
+        open={openAdd}
+        onClose={() => setOpenAdd(false)}
+        onSubmit={handleAddTemplate}
+      />
+
+      {/* Snackbar */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          severity={snackbar.severity}
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
 
       {/* Pagination */}
       {totalPages > 1 && (
