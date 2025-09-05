@@ -10,6 +10,7 @@ import UserHome from "@/features/user-dashboard/components/UserHome";
 import WorkspacePicker from "@/features/user-dashboard/components/WorkspacePicker";
 import Contact from "@/features/contact/components/Contact";
 import MessageTemplate from "@/features/message-template/components/MessageTemplate";
+import Campaign from "@/features/campaign/components/Campaign";
 
 const router = createBrowserRouter([
     {path : '/' , element : <Landing/>},
@@ -23,7 +24,8 @@ const router = createBrowserRouter([
     {path: '/user/dashboard' , element : <UserDashboardPage/> , children: [
         {path : '' , element : <UserHome/>},
         {path : 'contacts' , element : <Contact/>},
-        {path : 'templates' , element : <MessageTemplate/>}
+        {path : 'templates' , element : <MessageTemplate/>},
+        {path : 'campaigns' , element : <Campaign/>},
     ]},
 ])
 

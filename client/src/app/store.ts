@@ -5,6 +5,7 @@ import userAuthReducer from '@/features/auth-user/slices/userAuthSlice';
 import contactReducer from '@/features/contact/slices/contactSlice';
 import userWorkspaceReducer from '@/features/user-dashboard/slice/userWorkspaceSlice';
 import messageTemplateReducer from '@/features/message-template/slices/messageTemplateSlice';
+import campaingReducer from '@/features/campaign/slices/campaignSlice';
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     contact : contactReducer,
     userWorkspace : userWorkspaceReducer,
     messageTemplate : messageTemplateReducer,
+    campaign : campaingReducer,
   },
 });
 

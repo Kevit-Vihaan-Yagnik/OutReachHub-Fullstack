@@ -18,7 +18,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useNavigate } from "react-router-dom";
-import { Contacts, Message } from "@mui/icons-material";
+import { Campaign, Contacts, Message } from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
 
@@ -64,6 +64,12 @@ export default function UserDashboardLayout({ children }: Props) {
             <Message color="primary" />
           </ListItemIcon>
           <ListItemText primary="Message Templates" />
+        </ListItemButton>
+        <ListItemButton onClick={() => navigate("/user/dashboard/campaigns")}>
+          <ListItemIcon>
+            <Campaign color="primary" />
+          </ListItemIcon>
+          <ListItemText primary="Campaigns" />
         </ListItemButton>
         <ListItemButton onClick={() => navigate("/user/login")}>
           <ListItemIcon>

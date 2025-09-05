@@ -19,7 +19,6 @@ export interface ITemplateFormData {
   campaignImage?: string;
 }
 
-// ✅ Validation schema
 export const schema: yup.ObjectSchema<ITemplateFormData> = yup.object().shape({
   title: yup.string().required("Title is required"),
   type: yup.string().oneOf(["text", "text-image"]).required(),
