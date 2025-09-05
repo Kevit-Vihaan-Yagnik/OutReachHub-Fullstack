@@ -73,3 +73,7 @@ export const deleteContactApi = async(workspaceId : string , contactId : string)
   const res : {message: string , data : IContact} = await del(`/contact/${workspaceId}/${contactId}`);
   return res.message
 }
+
+export const getContactsByTags = async (workspaceId : string , data : {tags : string[]}) : Promise<IContact[]>=>{
+  return await post(`/contact/filterTags/${workspaceId}` , data)
+}

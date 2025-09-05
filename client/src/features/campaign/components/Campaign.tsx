@@ -20,15 +20,27 @@ import {
   useMediaQuery,
   useTheme,
   TablePagination,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useState, useMemo, useEffect } from "react";
-import type { ICampaign } from "../types";
+import type { ICampaign, ICampaignFormData } from "../types";
 import { format } from "date-fns";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
-import { setCampaigns, setError, setLoading } from "../slices/campaignSlice";
-import { getCampaignsByWorkspace } from "../service/campaign.service";
+import {
+  addCampaign,
+  setCampaigns,
+  setError,
+  setLoading,
+} from "../slices/campaignSlice";
+import {
+  createCampaignApi,
+  getCampaignsByWorkspace,
+} from "../service/campaign.service";
+import type { IContact } from "@/features/contact/types";
+import AddCampaignModal from "./AddCampaignModal";
 
 export default function CampaignTable() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -47,17 +59,66 @@ export default function CampaignTable() {
     null
   );
 
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error";
+  }>({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  const handleCloseSnackbar = () => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  };
+
   const dispatch = useDispatch();
-  const { campaigns} = useSelector(
-    (state: RootState) => state.campaign
-  );
+  const { campaigns } = useSelector((state: RootState) => state.campaign);
   const workspaceId = useSelector(
     (state: RootState) => state.userAuth.currentWorkspace?.id
   );
 
+  const [openAdd, setOpenAdd] = useState(false);
+
+  const handleAddCampaign = async (
+    data: ICampaignFormData
+  ) => {
+    try {
+      if (!workspaceId) {
+        console.error("❌ No workspaceId found");
+        setSnackbar({
+          open: true,
+          message: "Workspace not found!",
+          severity: "error",
+        });
+        return;
+      }
+
+      const newCampaign = await createCampaignApi(workspaceId, data);
+
+      dispatch(addCampaign(newCampaign));
+
+      setSnackbar({
+        open: true,
+        message: "✅ Campaign created successfully!",
+        severity: "success",
+      });
+
+      setOpenAdd(false);
+    } catch (err) {
+      console.error("❌ Failed to create campaign:", err);
+      setSnackbar({
+        open: true,
+        message: "❌ Failed to create campaign",
+        severity: "error",
+      });
+    }
+  };
+
   useEffect(() => {
     const fetchCampaigns = async () => {
-      if (!workspaceId) return; 
+      if (!workspaceId) return;
       try {
         dispatch(setLoading(true));
         const data = await getCampaignsByWorkspace(workspaceId);
@@ -142,7 +203,11 @@ export default function CampaignTable() {
         <Typography variant="h4" fontWeight={700}>
           Campaigns
         </Typography>
-        <Button variant="contained" color="primary">
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => setOpenAdd(true)}
+        >
           Add Campaign +
         </Button>
       </Box>
@@ -266,6 +331,31 @@ export default function CampaignTable() {
             )}
           </TableBody>
         </Table>
+
+        {/* 🔹 Modals */}
+        <AddCampaignModal
+          open={openAdd}
+          onClose={() => setOpenAdd(false)}
+          onSubmit={async (formData) =>
+            await handleAddCampaign(formData)
+          }
+        />
+
+        {/* Snackbar */}
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={4000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        >
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity={snackbar.severity}
+            sx={{ width: "100%" }}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
 
         {/* Pagination */}
         <TablePagination
