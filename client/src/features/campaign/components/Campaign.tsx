@@ -39,8 +39,8 @@ import {
   createCampaignApi,
   getCampaignsByWorkspace,
 } from "../service/campaign.service";
-import type { IContact } from "@/features/contact/types";
 import AddCampaignModal from "./AddCampaignModal";
+import ViewCampaignModal from "./ViewCampaignModal";
 
 export default function CampaignTable() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -80,10 +80,9 @@ export default function CampaignTable() {
   );
 
   const [openAdd, setOpenAdd] = useState(false);
+  const [openView, setOpenView] = useState(false);
 
-  const handleAddCampaign = async (
-    data: ICampaignFormData
-  ) => {
+  const handleAddCampaign = async (data: ICampaignFormData) => {
     try {
       if (!workspaceId) {
         console.error("❌ No workspaceId found");
@@ -142,7 +141,6 @@ export default function CampaignTable() {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    setSelectedCampaign(null);
   };
 
   // collect unique tags for filter dropdown
@@ -336,9 +334,16 @@ export default function CampaignTable() {
         <AddCampaignModal
           open={openAdd}
           onClose={() => setOpenAdd(false)}
-          onSubmit={async (formData) =>
-            await handleAddCampaign(formData)
-          }
+          onSubmit={async (formData) => await handleAddCampaign(formData)}
+        />
+
+        <ViewCampaignModal
+          open={openView}
+          onClose={() => {
+            setOpenView(false);
+            setSelectedCampaign(null);
+          }}
+          campaignId={selectedCampaign?._id}
         />
 
         {/* Snackbar */}
@@ -378,7 +383,16 @@ export default function CampaignTable() {
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
-        <MenuItem onClick={handleMenuClose}>View</MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (selectedCampaign) {
+              setOpenView(true);
+            }
+            handleMenuClose();
+          }}
+        >
+          View
+        </MenuItem>
         <MenuItem onClick={handleMenuClose}>Edit</MenuItem>
         <MenuItem onClick={handleMenuClose} sx={{ color: "error.main" }}>
           Delete
