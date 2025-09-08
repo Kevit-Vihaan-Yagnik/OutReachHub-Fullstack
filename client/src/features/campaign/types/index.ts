@@ -75,6 +75,17 @@ export interface ICampaignRecipient {
   __v: number;
 }
 
+export interface ICampaignStartRes {
+  message: string;
+  campaignId : string;
+  audienceSize : number;
+}
+
+// {
+//     "message": "campaign started",
+//     "campaignId": "68be791bef534eaded8c33f4",
+//     "audienceSize": 2
+// }
 
 
 // validation schema

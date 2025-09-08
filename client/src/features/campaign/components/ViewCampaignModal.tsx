@@ -24,7 +24,7 @@ import {
 interface ViewCampaignModalProps {
   open: boolean;
   onClose: () => void;
-  campaignId?: string; 
+  campaignId?: string;
 }
 
 export default function ViewCampaignModal({

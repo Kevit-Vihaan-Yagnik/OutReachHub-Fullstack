@@ -1,10 +1,31 @@
-import { get, post } from "@/utils/api.util";
+import { get, patch, post } from "@/utils/api.util";
 import type {
   ICampaign,
   ICampaignDetail,
   ICampaignFormData,
   ICampaignRecipient,
+  ICampaignStartRes,
 } from "../types";
+
+
+export const mapCampaignDetailToCampaign = (detail: ICampaignDetail): ICampaign => ({
+  _id: detail._id,
+  workspaceId: detail.workspaceId,
+  creator: detail.creator._id,
+  templateId: detail.templateId._id,
+  lastModifiedBy: detail.lastModifiedBy._id,
+  name: detail.name,
+  tags: detail.tags,
+  status: detail.status,
+  startDate: detail.startDate,
+  endDate: detail.endDate,
+  audienceSize: detail.audienceSize,
+  isDeleted: detail.isDeleted,
+  createdAt: detail.createdAt,
+  updatedAt: detail.updatedAt,
+  __v: detail.__v,
+});
+
 
 export const getCampaignsByWorkspace = async (
   workspaceId: string
@@ -28,5 +49,19 @@ export const getCampignDetails = async (
 export const getContactOfCampaign = async (
   campaingId: string
 ): Promise<ICampaignRecipient> => {
-  return await get(`campaign/contactInfo/${campaingId}`);
+  return await get(`/campaign/contactInfo/${campaingId}`);
+};
+
+export const runCampaignNow = async (
+  campaignId: string
+): Promise<ICampaignStartRes> => {
+  return await post(`/campaign/${campaignId}/run-now`, {});
+};
+
+export const updateCampaignApi = async (
+  campaignId: string,
+  workspaceId: string,
+  data: ICampaignFormData
+): Promise<ICampaign> => {
+  return await patch(`/campaign/${campaignId}/${workspaceId}`, data);
 };

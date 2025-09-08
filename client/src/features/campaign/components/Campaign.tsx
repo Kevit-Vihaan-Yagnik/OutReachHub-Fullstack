@@ -25,7 +25,7 @@ import {
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useState, useMemo, useEffect } from "react";
-import type { ICampaign, ICampaignFormData } from "../types";
+import { type ICampaign, type ICampaignFormData } from "../types";
 import { format } from "date-fns";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
@@ -38,9 +38,14 @@ import {
 import {
   createCampaignApi,
   getCampaignsByWorkspace,
+  runCampaignNow,
+  getCampignDetails,
+  updateCampaignApi,
+  mapCampaignDetailToCampaign,
 } from "../service/campaign.service";
-import AddCampaignModal from "./AddCampaignModal";
+import AddEditFormaModal from "./AddEditCampaignModal";
 import ViewCampaignModal from "./ViewCampaignModal";
+import { updateCampaign } from "../slices/campaignSlice";
 
 export default function CampaignTable() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -81,6 +86,11 @@ export default function CampaignTable() {
 
   const [openAdd, setOpenAdd] = useState(false);
   const [openView, setOpenView] = useState(false);
+  const [startingId, setStartingId] = useState<string | null>(null);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [editingCampaign, setEditingCampaign] = useState<ICampaign | null>(
+    null
+  );
 
   const handleAddCampaign = async (data: ICampaignFormData) => {
     try {
@@ -115,19 +125,78 @@ export default function CampaignTable() {
     }
   };
 
-  useEffect(() => {
-    const fetchCampaigns = async () => {
-      if (!workspaceId) return;
-      try {
-        dispatch(setLoading(true));
-        const data = await getCampaignsByWorkspace(workspaceId);
-        dispatch(setCampaigns(data));
-      } catch (err: any) {
-        console.error("❌ Failed to fetch campaigns:", err);
-        dispatch(setError("Failed to load campaigns"));
-      }
-    };
+  const handleStartCampaign = async (campaignId: string) => {
+    try {
+      setStartingId(campaignId);
 
+      // Start the campaign
+      const res = await runCampaignNow(campaignId);
+
+      // Fetch updated campaign details from backend
+      const updated = await getCampignDetails(campaignId);
+
+      const mappedCampaign = mapCampaignDetailToCampaign(updated);
+
+      // Update Redux with new campaign state
+      dispatch(updateCampaign(mappedCampaign));
+      fetchCampaigns();
+      setSnackbar({
+        open: true,
+        message: res.message || "✅ Campaign started successfully!",
+        severity: "success",
+      });
+    } catch (err) {
+      console.error("❌ Failed to start campaign:", err);
+      setSnackbar({
+        open: true,
+        message: "❌ Failed to start campaign",
+        severity: "error",
+      });
+    } finally {
+      setStartingId(null);
+    }
+  };
+
+  const handleEditCampaign = async (data: ICampaignFormData) => {
+    if (!workspaceId || !editingCampaign) return;
+    try {
+      const updated = await updateCampaignApi(
+        editingCampaign._id,
+        workspaceId,
+        data
+      );
+      dispatch(updateCampaign(updated));
+      setSnackbar({
+        open: true,
+        message: "✅ Campaign updated successfully!",
+        severity: "success",
+      });
+      setOpenEdit(false);
+      fetchCampaigns();
+      setEditingCampaign(null);
+    } catch (err) {
+      setSnackbar({
+        open: true,
+        message: "❌ Failed to update campaign",
+        severity: "error",
+      });
+      console.error("❌ Failed to update campaign:", err);
+    }
+  };
+
+  const fetchCampaigns = async () => {
+    if (!workspaceId) return;
+    try {
+      dispatch(setLoading(true));
+      const data = await getCampaignsByWorkspace(workspaceId);
+      dispatch(setCampaigns(data));
+    } catch (err: any) {
+      console.error("❌ Failed to fetch campaigns:", err);
+      dispatch(setError("Failed to load campaigns"));
+    }
+  };
+
+  useEffect(() => {
     fetchCampaigns();
   }, [workspaceId, dispatch]);
 
@@ -284,8 +353,14 @@ export default function CampaignTable() {
                 {/* Start Button Column */}
                 <TableCell align="center">
                   {campaign.status === "Draft" && (
-                    <Button size="small" color="success" variant="contained">
-                      Start
+                    <Button
+                      size="small"
+                      color="success"
+                      variant="contained"
+                      disabled={startingId === campaign._id}
+                      onClick={() => handleStartCampaign(campaign._id)}
+                    >
+                      {startingId === campaign._id ? "Starting..." : "Start"}
                     </Button>
                   )}
                   {campaign.status === "Running" && (
@@ -331,11 +406,21 @@ export default function CampaignTable() {
         </Table>
 
         {/* 🔹 Modals */}
-        <AddCampaignModal
+        <AddEditFormaModal
           open={openAdd}
           onClose={() => setOpenAdd(false)}
           onSubmit={async (formData) => await handleAddCampaign(formData)}
         />
+
+        {editingCampaign && (
+          <AddEditFormaModal
+            open={openEdit}
+            onClose={() => setOpenEdit(false)}
+            onSubmit={handleEditCampaign}
+            mode="edit"
+            campaign={editingCampaign}
+          />
+        )}
 
         <ViewCampaignModal
           open={openView}
@@ -393,7 +478,23 @@ export default function CampaignTable() {
         >
           View
         </MenuItem>
-        <MenuItem onClick={handleMenuClose}>Edit</MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (selectedCampaign?.status === "Draft") {
+              setEditingCampaign(selectedCampaign);
+              setOpenEdit(true);
+            } else {
+              setSnackbar({
+                open: true,
+                message: "Campaign already in running mode!",
+                severity: "error",
+              });
+            }
+            handleMenuClose();
+          }}
+        >
+          Edit
+        </MenuItem>
         <MenuItem onClick={handleMenuClose} sx={{ color: "error.main" }}>
           Delete
         </MenuItem>

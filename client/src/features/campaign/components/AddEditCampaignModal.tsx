@@ -18,7 +18,7 @@ import { type RootState } from "@/app/store";
 import { useState, useEffect } from "react";
 import type { IContact } from "@/features/contact/types";
 import { getContactsByTags } from "@/features/contact/service/contact.service";
-import { schema, type ICampaignFormData } from "../types";
+import { schema, type ICampaignFormData, type ICampaign } from "../types";
 import type { IMessageTemplate } from "@/features/message-template/types";
 import { getMessageTemplatesApi } from "@/features/message-template/service/messageTemplate.service";
 
@@ -26,13 +26,19 @@ interface AddCampaignModalProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (data: ICampaignFormData, contacts: IContact[]) => void;
+  mode?: "add" | "edit";
+  campaign?: ICampaign;
 }
 
-export default function AddCampaignModal({
+export default function AddEditCampaignModal({
   open,
   onClose,
   onSubmit,
+  mode = "add",
+  campaign,
 }: AddCampaignModalProps) {
+  const isEdit = mode === "edit";
+
   // 🔹 Workspace tags from Redux
   const workspaceTags = useSelector(
     (state: RootState) => state.userWorkspace.tags
@@ -56,6 +62,24 @@ export default function AddCampaignModal({
     },
   });
 
+  // Prefill when editing
+  useEffect(() => {
+    if (isEdit && campaign) {
+      reset({
+        templateId: campaign.templateId,
+        name: campaign.name,
+        tags: campaign.tags,
+        status: 'Draft',
+        startDate: campaign.startDate
+          ? new Date(campaign.startDate).toISOString().slice(0, 16)
+          : "",
+        endDate: campaign.endDate
+          ? new Date(campaign.endDate).toISOString().slice(0, 16)
+          : "",
+      });
+    }
+  }, [isEdit, campaign, reset]);
+
   // watch selected tags
   const selectedTags = watch("tags");
 
@@ -63,7 +87,7 @@ export default function AddCampaignModal({
   const [contacts, setContacts] = useState<IContact[]>([]);
   const [loadingContacts, setLoadingContacts] = useState(false);
 
-  // get workspaceId from Redux (or props, depending on where you keep it)
+  // get workspaceId from Redux
   const workspaceId = useSelector(
     (state: RootState) => state.userWorkspace.current?._id
   );
@@ -115,9 +139,13 @@ export default function AddCampaignModal({
     onClose();
   };
 
+  const isDraft = campaign?.status === "Draft" || !isEdit;
+
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Add Campaign</DialogTitle>
+      <DialogTitle>
+        {isEdit ? "Edit Campaign" : "Add Campaign"}
+      </DialogTitle>
       <DialogContent>
         <Controller
           name="templateId"
@@ -132,6 +160,7 @@ export default function AddCampaignModal({
               value={templates.find((t) => t._id === field.value) || null}
               onChange={(_, value) => field.onChange(value ? value._id : "")}
               loading={loadingTemplates}
+              disabled={!isDraft}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -157,6 +186,7 @@ export default function AddCampaignModal({
               margin="normal"
               error={!!errors.name}
               helperText={errors.name?.message}
+              disabled={!isDraft}
             />
           )}
         />
@@ -172,6 +202,7 @@ export default function AddCampaignModal({
               options={workspaceTags}
               value={field.value || []}
               onChange={(_, value) => field.onChange(value)}
+              disabled={!isDraft}
               renderTags={(value: string[], getTagProps) =>
                 value.map((option: string, index: number) => (
                   <Chip
@@ -230,6 +261,7 @@ export default function AddCampaignModal({
               InputLabelProps={{ shrink: true }}
               error={!!errors.startDate}
               helperText={errors.startDate?.message}
+              disabled={!isDraft}
             />
           )}
         />
@@ -246,6 +278,7 @@ export default function AddCampaignModal({
               InputLabelProps={{ shrink: true }}
               error={!!errors.endDate}
               helperText={errors.endDate?.message}
+              disabled={!isDraft}
             />
           )}
         />
@@ -255,13 +288,15 @@ export default function AddCampaignModal({
         <Button onClick={onClose} color="secondary">
           Cancel
         </Button>
-        <Button
-          onClick={handleSubmit(handleFormSubmit)}
-          variant="contained"
-          color="primary"
-        >
-          Add
-        </Button>
+        {isDraft && (
+          <Button
+            onClick={handleSubmit(handleFormSubmit)}
+            variant="contained"
+            color="primary"
+          >
+            {isEdit ? "Update" : "Add"}
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   );
