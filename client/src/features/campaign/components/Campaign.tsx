@@ -31,6 +31,7 @@ import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
 import {
   addCampaign,
+  deleteCampaign,
   setCampaigns,
   setError,
   setLoading,
@@ -42,10 +43,12 @@ import {
   getCampignDetails,
   updateCampaignApi,
   mapCampaignDetailToCampaign,
+  deleteCampaignApi,
 } from "../service/campaign.service";
 import AddEditFormaModal from "./AddEditCampaignModal";
 import ViewCampaignModal from "./ViewCampaignModal";
 import { updateCampaign } from "../slices/campaignSlice";
+import DeleteCampaignModal from "./DeleteCampaignModal";
 
 export default function CampaignTable() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -91,6 +94,10 @@ export default function CampaignTable() {
   const [editingCampaign, setEditingCampaign] = useState<ICampaign | null>(
     null
   );
+  const [openDelete, setOpenDelete] = useState(false);
+  const [deletingCampaign, setDeletingCampaign] = useState<ICampaign | null>(
+    null
+  );
 
   const handleAddCampaign = async (data: ICampaignFormData) => {
     try {
@@ -107,6 +114,8 @@ export default function CampaignTable() {
       const newCampaign = await createCampaignApi(workspaceId, data);
 
       dispatch(addCampaign(newCampaign));
+
+      fetchCampaigns();
 
       setSnackbar({
         open: true,
@@ -181,6 +190,28 @@ export default function CampaignTable() {
         severity: "error",
       });
       console.error("❌ Failed to update campaign:", err);
+    }
+  };
+
+  const handleDeleteCampaign = async () => {
+    if (!deletingCampaign || !workspaceId) return;
+    try {
+      await deleteCampaignApi(deletingCampaign._id, workspaceId); // ✅ your API service
+      dispatch(deleteCampaign(deletingCampaign._id)); // ✅ update redux
+      setSnackbar({
+        open: true,
+        message: "✅ Campaign deleted successfully",
+        severity: "success",
+      });
+      setOpenDelete(false);
+      setDeletingCampaign(null);
+    } catch (err) {
+      console.error("❌ Failed to delete campaign:", err);
+      setSnackbar({
+        open: true,
+        message: "❌ Failed to delete campaign",
+        severity: "error",
+      });
     }
   };
 
@@ -431,6 +462,13 @@ export default function CampaignTable() {
           campaignId={selectedCampaign?._id}
         />
 
+        <DeleteCampaignModal
+          open={openDelete}
+          onClose={() => setOpenDelete(false)}
+          onConfirm={handleDeleteCampaign}
+          campaignName={deletingCampaign?.name}
+        />
+
         {/* Snackbar */}
         <Snackbar
           open={snackbar.open}
@@ -495,7 +533,22 @@ export default function CampaignTable() {
         >
           Edit
         </MenuItem>
-        <MenuItem onClick={handleMenuClose} sx={{ color: "error.main" }}>
+        <MenuItem
+          onClick={() => {
+            if (selectedCampaign?.status === "Draft") {
+              setDeletingCampaign(selectedCampaign);
+              setOpenDelete(true);
+            } else {
+              setSnackbar({
+                open: true,
+                message: "Campaign already in running mode!",
+                severity: "error",
+              });
+            }
+            handleMenuClose();
+          }}
+          sx={{ color: "error.main" }}
+        >
           Delete
         </MenuItem>
       </Menu>

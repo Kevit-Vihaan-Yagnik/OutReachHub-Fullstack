@@ -1,4 +1,4 @@
-import { get, patch, post } from "@/utils/api.util";
+import { del, get, patch, post } from "@/utils/api.util";
 import type {
   ICampaign,
   ICampaignDetail,
@@ -65,3 +65,10 @@ export const updateCampaignApi = async (
 ): Promise<ICampaign> => {
   return await patch(`/campaign/${campaignId}/${workspaceId}`, data);
 };
+
+export const deleteCampaignApi = async (
+  campaignId: string,
+  workspaceId: string,
+) => {
+  return await del(`/campaign/${campaignId}/${workspaceId}`);
+}
