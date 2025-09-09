@@ -1,6 +1,7 @@
 import { HttpException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
+import * as bcrypt from 'bcrypt';
 import { Workspace } from "src/schema/workspace.schema";
 import { CreateWorkspaceDto } from "./dto/createWorkspace.dto";
 import { User } from "src/schema/user.schema";
@@ -57,7 +58,7 @@ export class WorkspaceService {
         const user = await this.UserModel.findOne({
             _id: requester.sub,
             'workspaces.workspaceId': workspaceId,
-            'workspaces.permissions.viewer' : true
+            'workspaces.permission.viewer' : true
         });
 
         if (!user) {
@@ -65,10 +66,6 @@ export class WorkspaceService {
         }
 
         const workspacePermission = user.workspaces.find(ws => ws.workspaceId.toString() === workspaceId);
-
-        if (!workspacePermission?.permission.allowAdd) {
-            throw new UnauthorizedException('You do not have permission to add members to this workspace.');
-        }
     }
 
     async validateAdmin(adminId: string) {
@@ -141,10 +138,11 @@ export class WorkspaceService {
                 await user.save();
             } else {
                 // Generate random password
-                const randomPassword = Math.random().toString(36).slice(-8);
+                const randomPassword = 'user@123';
+                const hash = await bcrypt.hash(randomPassword, 10);
                 const newUser = new this.UserModel({
                     name,
-                    password: randomPassword,
+                    password: hash,
                     avatarUrl,
                     contactInfo,
                     workspaces: [{

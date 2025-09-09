@@ -23,7 +23,7 @@ export class ContactController {
         return this.contactService.createContact(workspaceId, creatContactDto, req['user'].sub);
     }
 
-    @Get('filterTags/:workspaceId')
+    @Post('filterTags/:workspaceId')
     async filterContacts(
         @Param('workspaceId') workspaceId : string,
         @Body('tags') tags : string[],
@@ -38,7 +38,7 @@ export class ContactController {
         @Param('workspaceId') workspaceId: string,
         @Req() req
     ) {
-        await this.workspaceService.isUserEditor(req['user'].sub, workspaceId);
+        await this.workspaceService.validateUsers(req['user'].sub, workspaceId);
         return this.contactService.getContactByWorkspace(workspaceId);
     }
 
@@ -48,7 +48,7 @@ export class ContactController {
         @Param('contactId') contactId: string,
         @Req() req
     ) {
-        await this.workspaceService.isUserEditor(req['user'].sub, workspaceId);
+        await this.workspaceService.validateUsers(req['user'].sub, workspaceId);
         return this.contactService.getContactById(contactId);
     }
 

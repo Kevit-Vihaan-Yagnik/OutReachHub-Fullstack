@@ -31,6 +31,14 @@ export class AuthService {
         return newAdmin.save();
     }
 
+    async getUserInfo(userId: string) {
+        const user = await this.UserModel.findById(userId).populate({
+            path: 'workspaces.workspaceId', // path to populate
+            select: 'name', // only bring back the name field
+        }).select('-password');;
+        return user;
+    }
+
     async resgisterUser(createUserDto: CreateUserDto) {
         const hash = await bcrypt.hash(createUserDto.password, 10);
         const newUser = new this.UserModel({
@@ -77,6 +85,8 @@ export class AuthService {
         await this.TokenModel.deleteMany({ user: user._id });
         await new this.TokenModel({ user: user._id, refreshToken }).save();
         return {
+            id: payload.sub,
+            email: payload.email,
             access_token: accessToken,
             refresh_token: refreshToken,
         };
@@ -91,7 +101,7 @@ export class AuthService {
     }
 
     async refreshAccessToken(refreshToken: string) {
-        const tokenDoc = await this.TokenModel.findOne({ refreshToken : refreshToken });
+        const tokenDoc = await this.TokenModel.findOne({ refreshToken: refreshToken });
 
         if (!tokenDoc) {
             // Token reuse detected: delete all tokens for user (if possible)

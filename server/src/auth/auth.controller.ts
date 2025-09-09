@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
 import { AuthGaurd } from "./auth.gaurd";
 import { CreateAdminDto } from "./dto/createAdmin.dto";
 import { AdminLoginDto } from "./dto/loginAdmin.dto";
@@ -34,6 +34,11 @@ export class AuthController{
     async refreshToken(@Body() body: { refreshToken: string }) {
         return this.authService.refreshAccessToken(body.refreshToken);
     }
+
+    @Get('user/detail/:id')
+    async userDetail(@Param('id') id : string){
+        return this.authService.getUserInfo(id);
+    }   
 
     @Post('user/logout')
     @UseGuards(AuthGaurd)

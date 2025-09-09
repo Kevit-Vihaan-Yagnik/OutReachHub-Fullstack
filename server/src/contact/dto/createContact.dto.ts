@@ -32,7 +32,7 @@ class SingleContactDto {
   name: string;
 
   @IsOptional()
-  @IsUrl()
+  @IsString()
   profilePicture?: string;
 
   @ValidateNested()

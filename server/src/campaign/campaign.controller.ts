@@ -51,6 +51,11 @@ export class CampaignController {
         return this.campaignService.getCampaignById(campaignId);
     }
 
+    @Get("contactInfo/:id")
+    async getContactByCampaign(@Param("id") campaignId : string){
+        return this.campaignService.getContactOfCampaign(campaignId);
+    }
+
     @Patch(":id/:workspaceId")
     async updateCampaign(
         @Param("id") campaignId: string,

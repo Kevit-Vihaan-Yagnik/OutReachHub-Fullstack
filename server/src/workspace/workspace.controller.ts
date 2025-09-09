@@ -25,7 +25,8 @@ export class WorkspaceController {
 
     @Get(':id')
     async getWokspacesByID(@Req() req, @Param('id') id: string) {
-        await this.workspaceService.validateUsers(req['user'].sub, id);
+        const requester = req.admin|| req.user
+        await this.workspaceService.validateRequesterPermission(requester, id)
         return this.workspaceService.getWorkspaceById(id);
     }
 
@@ -73,7 +74,7 @@ export class WorkspaceController {
         return this.workspaceService.addTags(workspaceId, body.tags);
     }
 
-    @Delete(':id/tags')
+    @Post(':id/delete/tags')
     async deleteTags(
         @Param('id') workspaceId: string,
         @Body() body: { tags: string[] },
