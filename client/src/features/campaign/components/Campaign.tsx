@@ -86,6 +86,9 @@ export default function CampaignTable() {
   const workspaceId = useSelector(
     (state: RootState) => state.userAuth.currentWorkspace?.id
   );
+  const permission = useSelector(
+    (state: RootState) => state.userAuth.currentWorkspace?.permission.editor
+  );
 
   const [openAdd, setOpenAdd] = useState(false);
   const [openView, setOpenView] = useState(false);
@@ -301,13 +304,17 @@ export default function CampaignTable() {
         <Typography variant="h4" fontWeight={700}>
           Campaigns
         </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setOpenAdd(true)}
-        >
-          Add Campaign +
-        </Button>
+        {permission ? (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setOpenAdd(true)}
+          >
+            Add Campaign +
+          </Button>
+        ) : (
+          ""
+        )}
       </Box>
 
       {/* Filters */}
@@ -516,41 +523,47 @@ export default function CampaignTable() {
         >
           View
         </MenuItem>
-        <MenuItem
-          onClick={() => {
-            if (selectedCampaign?.status === "Draft") {
-              setEditingCampaign(selectedCampaign);
-              setOpenEdit(true);
-            } else {
-              setSnackbar({
-                open: true,
-                message: "Campaign already in running mode!",
-                severity: "error",
-              });
-            }
-            handleMenuClose();
-          }}
-        >
-          Edit
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            if (selectedCampaign?.status === "Draft") {
-              setDeletingCampaign(selectedCampaign);
-              setOpenDelete(true);
-            } else {
-              setSnackbar({
-                open: true,
-                message: "Campaign already in running mode!",
-                severity: "error",
-              });
-            }
-            handleMenuClose();
-          }}
-          sx={{ color: "error.main" }}
-        >
-          Delete
-        </MenuItem>
+        {permission ? (
+          <div>
+            <MenuItem
+              onClick={() => {
+                if (selectedCampaign?.status === "Draft") {
+                  setEditingCampaign(selectedCampaign);
+                  setOpenEdit(true);
+                } else {
+                  setSnackbar({
+                    open: true,
+                    message: "Campaign already in running mode!",
+                    severity: "error",
+                  });
+                }
+                handleMenuClose();
+              }}
+            >
+              Edit
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                if (selectedCampaign?.status === "Draft") {
+                  setDeletingCampaign(selectedCampaign);
+                  setOpenDelete(true);
+                } else {
+                  setSnackbar({
+                    open: true,
+                    message: "Campaign already in running mode!",
+                    severity: "error",
+                  });
+                }
+                handleMenuClose();
+              }}
+              sx={{ color: "error.main" }}
+            >
+              Delete
+            </MenuItem>
+          </div>
+        ) : (
+          ""
+        )}
       </Menu>
     </Box>
   );

@@ -53,9 +53,12 @@ export default function Contact() {
     (state: RootState) => state.userAuth.currentWorkspace?.id
   );
 
-  // 🔹 Contacts from Redux
+  // 🔹 Elements from Redux
   const { contacts, loading, error } = useSelector(
     (state: RootState) => state.contact
+  );
+  const permission = useSelector(
+    (state: RootState) => state.userAuth.currentWorkspace?.permission.editor
   );
 
   //🔹 Workspace tags from Redux
@@ -242,13 +245,17 @@ export default function Contact() {
           >
             Search
           </Button>
-          <Button
-            variant="contained"
-            sx={{ ml: 2 }}
-            onClick={() => setOpenAdd(true)}
-          >
-            Add +
-          </Button>
+          {permission ? (
+            <Button
+              variant="contained"
+              sx={{ ml: 2 }}
+              onClick={() => setOpenAdd(true)}
+            >
+              Add +
+            </Button>
+          ) : (
+            ""
+          )}
         </Grid>
       </Grid>
 
@@ -342,28 +349,34 @@ export default function Contact() {
         >
           View
         </MenuItem>
-        <MenuItem
-          onClick={() => {
-            if (menuRow) {
-              setSelectedContact(menuRow);
-              setOpenEdit(true);
-            }
-            handleMenuClose();
-          }}
-        >
-          Edit
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            if (menuRow) {
-              setSelectedContact(menuRow);
-              setOpenDelete(true);
-            }
-            handleMenuClose();
-          }}
-        >
-          Delete
-        </MenuItem>
+        {permission ? (
+          <div>
+            <MenuItem
+              onClick={() => {
+                if (menuRow) {
+                  setSelectedContact(menuRow);
+                  setOpenEdit(true);
+                }
+                handleMenuClose();
+              }}
+            >
+              Edit
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                if (menuRow) {
+                  setSelectedContact(menuRow);
+                  setOpenDelete(true);
+                }
+                handleMenuClose();
+              }}
+            >
+              Delete
+            </MenuItem>
+          </div>
+        ) : (
+          ""
+        )}
       </Menu>
 
       {/* Modals */}

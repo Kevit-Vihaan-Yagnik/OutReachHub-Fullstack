@@ -11,11 +11,12 @@ export default function UserProtectedRoute({ children }: Props) {
   const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.userAuth);
   const [loading, setLoading] = useState(true);
+  const userAuth = localStorage.getItem('userAuth');
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        if (!user) {
+        if (!user || !userAuth) {
           navigate("/user/login"); // 👈 redirect to user login if not authenticated
           return;
         }

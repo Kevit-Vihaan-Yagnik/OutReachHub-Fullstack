@@ -39,7 +39,6 @@ export default function WorkspacePicker() {
                 if(!userId) navigate('/user/login')
                 setLoading(true);
                 const res = await getUserDetail(userId!);
-                console.log(res)
                 setDetail(res);
             } catch (e: any) {
                 setError(e?.message || "Failed to load workspaces");

@@ -46,6 +46,10 @@ export default function MessageTemplate() {
     (state: RootState) => state.userAuth.currentWorkspace?.id
   );
 
+  const permission = useSelector(
+    (state: RootState) => state.userAuth.currentWorkspace?.permission.editor
+  );
+
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -176,13 +180,17 @@ export default function MessageTemplate() {
         <Typography variant="h4" fontWeight={700} color="primary">
           Message Templates
         </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setOpenAdd(true)}
-        >
-          Add Template +
-        </Button>
+        {permission ? (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setOpenAdd(true)}
+          >
+            Add Template +
+          </Button>
+        ) : (
+          ""
+        )}
       </Box>
 
       {/* Filters */}
@@ -259,16 +267,20 @@ export default function MessageTemplate() {
               >
                 View
               </Button>
-              <Button
-                size="small"
-                color="error"
-                onClick={() => {
-                  setDeleteTemplate(template);
-                  setDeleteOpen(true);
-                }}
-              >
-                Delete
-              </Button>
+              {permission ? (
+                <Button
+                  size="small"
+                  color="error"
+                  onClick={() => {
+                    setDeleteTemplate(template);
+                    setDeleteOpen(true);
+                  }}
+                >
+                  Delete
+                </Button>
+              ) : (
+                ''
+              )}
             </CardActions>
           </Card>
         ))}

@@ -40,7 +40,6 @@ const UserLogin = () => {
                     refresh_token: res.refresh_token,
                 })
             );
-            console.log('response from api : ' + res)
             setOpenSnackbar(true);
             navigate('/user/workspace-picker')
         } catch (error) {

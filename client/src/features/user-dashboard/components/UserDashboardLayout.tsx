@@ -2,6 +2,8 @@ import * as React from "react";
 import {
   AppBar,
   Box,
+  Button,
+  Chip,
   CssBaseline,
   Divider,
   Drawer,
@@ -19,8 +21,12 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useNavigate } from "react-router-dom";
 import { Campaign, Contacts, Message } from "@mui/icons-material";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
+import { userLogout } from "@/features/auth-user/slices/userAuthSlice";
+import { clearUserWorkspace } from "../slice/userWorkspaceSlice";
+import type { IUserDetail } from "../types";
+import { getUserDetail } from "../service/dashboard.service";
 
 const drawerWidth = 240;
 
@@ -32,16 +38,52 @@ export default function UserDashboardLayout({ children }: Props) {
   const theme = useTheme();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const workspaceName = useSelector((state : RootState) => state.userAuth.currentWorkspace?.name)
-
+  const workspaceName = useSelector(
+    (state: RootState) => state.userAuth.currentWorkspace?.name
+  );
+  const dispatch = useDispatch();
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+  const email = useSelector((state: RootState) => state.userAuth.user?.email);
+  const permissions = useSelector(
+    (state: RootState) => state.userAuth.currentWorkspace?.permission
+  );
+  const userId = useSelector((state: RootState) => state.userAuth.user?.id);
+  const [hasMultipleWorkspaces, setHasMultipleWorkspaces] =
+    React.useState(false);
+
+  React.useEffect(() => {
+    const loadWorkspaces = async () => {
+      if (!userId) return;
+      try {
+        const detail: IUserDetail = await getUserDetail(userId);
+        const activeWorkspaces = detail.workspaces.filter(
+          (w) => w.permission?.viewer !== false
+        );
+        setHasMultipleWorkspaces(activeWorkspaces.length > 1);
+      } catch (err) {
+        console.error("Failed to load workspaces", err);
+      }
+    };
+    loadWorkspaces();
+  }, [userId]);
+
+  const handleLogout = () => {
+    dispatch(userLogout());
+    dispatch(clearUserWorkspace());
+    navigate("/user/login");
   };
 
   const drawer = (
     <Box>
       <Toolbar>
-        <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 700 }}>
+        <Typography
+          variant="h6"
+          noWrap
+          component="div"
+          sx={{ fontWeight: 700 }}
+        >
           OutReachHub
         </Typography>
       </Toolbar>
@@ -71,7 +113,7 @@ export default function UserDashboardLayout({ children }: Props) {
           </ListItemIcon>
           <ListItemText primary="Campaigns" />
         </ListItemButton>
-        <ListItemButton onClick={() => navigate("/user/login")}>
+        <ListItemButton onClick={handleLogout}>
           <ListItemIcon>
             <LogoutIcon color="error" />
           </ListItemIcon>
@@ -95,20 +137,58 @@ export default function UserDashboardLayout({ children }: Props) {
           boxShadow: 1,
         }}
       >
-        <Toolbar>
-          {/* Mobile menu button */}
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: "none" } }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            User Panel - {workspaceName}
-          </Typography>
+        <Toolbar
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          {/* Left side: menu + workspace name */}
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2, display: { sm: "none" } }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6" noWrap component="div">
+              {workspaceName}
+            </Typography>
+          </Box>
+
+          {/* Right side: user info */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            {permissions &&
+              Object.entries(permissions)
+                .filter(([_, value]) => value) // show only "true" permissions
+                .map(([key]) => (
+                  <Chip
+                    key={key}
+                    label={key}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                  />
+                ))}
+            <Typography variant="body2" sx={{ ml: 2, fontWeight: 500 }}>
+              {email}
+            </Typography>
+
+            {hasMultipleWorkspaces && (
+              <Button
+                variant="outlined"
+                size="small"
+                sx={{ ml: 2 }}
+                onClick={() => navigate("/user/workspace-picker")}
+              >
+                Switch Workspace
+              </Button>
+            )}
+          </Box>
         </Toolbar>
       </AppBar>
 
@@ -126,7 +206,10 @@ export default function UserDashboardLayout({ children }: Props) {
           ModalProps={{ keepMounted: true }}
           sx={{
             display: { xs: "block", sm: "none" },
-            "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
           }}
         >
           {drawer}
@@ -137,7 +220,10 @@ export default function UserDashboardLayout({ children }: Props) {
           variant="permanent"
           sx={{
             display: { xs: "none", sm: "block" },
-            "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
           }}
           open
         >
