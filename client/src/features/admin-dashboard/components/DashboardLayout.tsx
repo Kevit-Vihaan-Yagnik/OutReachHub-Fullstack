@@ -19,6 +19,9 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useNavigate } from "react-router-dom";
 import { Workspaces } from "@mui/icons-material";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "@/features/auth/slices/adminAuthSlice";
+import type { RootState } from "@/app/store";
 
 const drawerWidth = 240;
 
@@ -30,15 +33,26 @@ export default function DashboardLayout({ children }: Props) {
   const theme = useTheme();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = React.useState(false);
-
+  const dispatch = useDispatch();
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+  const email = useSelector((state: RootState) => state.adminAuth.admin?.email);
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/admin/login");
   };
 
   const drawer = (
     <Box>
       <Toolbar>
-        <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 700 }}>
+        <Typography
+          variant="h6"
+          noWrap
+          component="div"
+          sx={{ fontWeight: 700 }}
+        >
           OutReachHub
         </Typography>
       </Toolbar>
@@ -56,7 +70,7 @@ export default function DashboardLayout({ children }: Props) {
           </ListItemIcon>
           <ListItemText primary="Workspace" />
         </ListItemButton>
-        <ListItemButton onClick={() => navigate("/admin/login")}>
+        <ListItemButton onClick={handleLogout}>
           <ListItemIcon>
             <LogoutIcon color="error" />
           </ListItemIcon>
@@ -91,8 +105,18 @@ export default function DashboardLayout({ children }: Props) {
           >
             <MenuIcon />
           </IconButton>
+
+          {/* Left side - Title */}
           <Typography variant="h6" noWrap component="div">
             Admin Panel
+          </Typography>
+
+          {/* Spacer */}
+          <Box sx={{ flexGrow: 1 }} />
+
+          {/* Right side - Email */}
+          <Typography variant="body1" noWrap>
+            {email}
           </Typography>
         </Toolbar>
       </AppBar>
@@ -111,7 +135,10 @@ export default function DashboardLayout({ children }: Props) {
           ModalProps={{ keepMounted: true }}
           sx={{
             display: { xs: "block", sm: "none" },
-            "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
           }}
         >
           {drawer}
@@ -122,7 +149,10 @@ export default function DashboardLayout({ children }: Props) {
           variant="permanent"
           sx={{
             display: { xs: "none", sm: "block" },
-            "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
           }}
           open
         >

@@ -1,10 +1,4 @@
-import {
-  Box,
-  Grid,
-  Paper,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Box, Grid, Paper, Typography, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import {
   BarChart,
@@ -20,26 +14,14 @@ import {
 } from "recharts";
 import { analytics } from "../service/analytics.service";
 import type { IWorkspace } from "../types";
-
-
-const barData = [
-  { name: "Mon", value: 30 },
-  { name: "Tue", value: 50 },
-  { name: "Wed", value: 45 },
-  { name: "Thu", value: 60 },
-  { name: "Fri", value: 40 },
-  { name: "Sat", value: 80 },
-  { name: "Sun", value: 55 },
+const COLORS = [
+  "#0088FE",
+  "#00C49F",
+  "#FFBB28",
+  "#FF8042",
+  "#AF19FF",
+  "#FF4560",
 ];
-
-const pieData = [
-  { name: "Email", value: 400 },
-  { name: "SMS", value: 300 },
-  { name: "Social", value: 300 },
-  { name: "Others", value: 200 },
-];
-
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 export default function Home() {
   const theme = useTheme();
@@ -51,15 +33,37 @@ export default function Home() {
     { title: "Revenue", value: "$12.3k" },
   ]);
 
+  const [campaignWorkspaceData, setCampaignWorkspaceData] = useState<
+    { name: string; value: number }[]
+  >([]);
 
-   useEffect(() => {
+  const [usersPieData, setUsersPieData] = useState<
+    { name: string; value: number }[]
+  >([]);
+
+  useEffect(() => {
     const fetchAnalytics = async () => {
       try {
         const res: IWorkspace[] = await analytics();
 
         const workspacesCount = res.length;
         const usersCount = res.reduce((acc, w) => acc + w.users.length, 0);
-        const campaignsCount = res.reduce((acc, w) => acc + w.campaigns.length, 0);
+        const campaignsCount = res.reduce(
+          (acc, w) => acc + w.campaigns.length,
+          0
+        );
+
+        // 🔹 Campaigns by Workspace
+        const workspaceData = res.map((w) => ({
+          name: w.name,
+          value: w.campaigns.length,
+        }));
+
+        // 🔹 Users by Workspace (Pie Chart)
+        const pieData = res.map((w) => ({
+          name: w.name,
+          value: w.users.length,
+        }));
 
         setStats([
           { title: "Workspaces", value: workspacesCount.toString() },
@@ -67,6 +71,9 @@ export default function Home() {
           { title: "Campaigns", value: campaignsCount.toString() },
           { title: "Revenue", value: "$12.3k" },
         ]);
+
+        setCampaignWorkspaceData(workspaceData);
+        setUsersPieData(pieData);
       } catch (err) {
         console.log(err);
       }
@@ -75,7 +82,13 @@ export default function Home() {
   }, []);
 
   return (
-    <Box sx={{ p: 3, backgroundColor: theme.palette.background.default, minHeight: "100vh" }}>
+    <Box
+      sx={{
+        p: 3,
+        backgroundColor: theme.palette.background.default,
+        minHeight: "100vh",
+      }}
+    >
       {/* Title */}
       <Typography variant="h4" fontWeight={700} mb={3} color="primary">
         Admin Dashboard
@@ -108,41 +121,45 @@ export default function Home() {
 
       {/* Charts */}
       <Grid container spacing={3}>
-        {/* Bar Chart */}
+        {/* Campaigns by Workspace */}
         <Grid size={{ xs: 12, sm: 8 }}>
           <Paper sx={{ p: 3, borderRadius: 3 }} elevation={3}>
             <Typography variant="h6" fontWeight={600} mb={2}>
-              Weekly Engagement
+              Campaigns by Workspace
             </Typography>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={barData}>
+              <BarChart data={campaignWorkspaceData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip cursor={{ fill: 'transparent' }} />
-                <Bar dataKey="value" fill={theme.palette.primary.main} radius={[5, 5, 0, 0]} />
+                <YAxis allowDecimals={false} />
+                <Tooltip cursor={{ fill: "transparent" }} />
+                <Bar
+                  dataKey="value"
+                  fill={theme.palette.primary.main}
+                  radius={[5, 5, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </Paper>
         </Grid>
 
-        {/* Pie Chart */}
+        {/* Users by Workspace (Pie Chart) */}
         <Grid size={{ xs: 12, md: 4 }}>
           <Paper sx={{ p: 3, borderRadius: 3 }} elevation={3}>
             <Typography variant="h6" fontWeight={600} mb={2}>
-              Campaign Channels
+              Users by Workspace
             </Typography>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
-                  data={pieData}
+                  data={usersPieData}
                   dataKey="value"
                   cx="50%"
                   cy="50%"
                   outerRadius={100}
                   label
                 >
-                  {pieData.map((_, index) => (
+                  {usersPieData.map((_, index) => (
                     <Cell key={index} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
