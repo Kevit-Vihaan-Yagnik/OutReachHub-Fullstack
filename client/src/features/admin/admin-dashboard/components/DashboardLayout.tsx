@@ -20,7 +20,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { useNavigate } from "react-router-dom";
 import { Workspaces } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "@/features/auth/slices/adminAuthSlice";
+import { logout } from "@/features/admin/auth/slices/adminAuthSlice";
 import type { RootState } from "@/app/store";
 
 const drawerWidth = 240;

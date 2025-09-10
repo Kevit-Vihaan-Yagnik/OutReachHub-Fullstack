@@ -15,12 +15,12 @@ import {
 import { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { type RootState } from "@/app/store";
-import { getWorkspaceById } from "@/features/workspace/service/workspace.service";
-import { getCampaignsByWorkspace } from "@/features/campaign/service/campaign.service";
-import { getContactsByWorkspace } from "@/features/contact/service/contact.service";
-import type { IWorkspace } from "@/features/workspace/types";
-import type { ICampaign } from "@/features/campaign/types";
-import type { IContact } from "@/features/contact/types";
+import { getWorkspaceById } from "@/features/admin/workspace/service/workspace.service";
+import { getCampaignsByWorkspace } from "@/features/user/campaign/service/campaign.service";
+import { getContactsByWorkspace } from "@/features/user/contact/service/contact.service";
+import type { IWorkspace } from "@/features/admin/workspace/types";
+import type { ICampaign } from "@/features/user/campaign/types";
+import type { IContact } from "@/features/user/contact/types";
 import {
   PieChart,
   Pie,

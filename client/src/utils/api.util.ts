@@ -2,8 +2,8 @@ import { store } from "@/app/store";
 import {
   userLogout,
   userSetTokens,
-} from "@/features/auth-user/slices/userAuthSlice";
-import { logout, setTokens } from "@/features/auth/slices/adminAuthSlice";
+} from "@/features/user/auth-user/slices/userAuthSlice";
+import { logout, setTokens } from "@/features/admin/auth/slices/adminAuthSlice";
 import axios, { AxiosError } from "axios";
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
 

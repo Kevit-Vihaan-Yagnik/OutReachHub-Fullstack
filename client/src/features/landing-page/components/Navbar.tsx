@@ -6,9 +6,11 @@ import {
   Button,
   useTheme,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
 
   const navItems = ['Home', 'Features', 'Pricing', 'FAQs'];
 
@@ -72,6 +74,7 @@ const Navbar = () => {
             color="inherit"
             variant="outlined"
             sx={{ mx: 1, borderRadius: 20, textTransform: 'none', '&:hover': { borderColor: theme.palette.primary.main } }}
+            onClick={()=>navigate('/user/login')}
           >
             Get Started
           </Button>

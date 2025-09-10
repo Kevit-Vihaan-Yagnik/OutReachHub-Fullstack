@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 
 import { getUserDetail } from "../service/dashboard.service";
 import type { IUserDetail, IUserWorkspaceLink, ICurrentWorkspace } from "../types";
-import { setCurrentWorkspace } from "@/features/auth-user/slices/userAuthSlice";
+import { setCurrentWorkspace } from "@/features/user/auth-user/slices/userAuthSlice";
 import type { RootState } from "@/app/store";
 
 export default function WorkspacePicker() {

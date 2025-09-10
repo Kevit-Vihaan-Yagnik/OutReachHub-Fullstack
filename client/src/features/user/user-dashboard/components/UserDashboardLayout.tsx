@@ -23,7 +23,7 @@ import { useNavigate } from "react-router-dom";
 import { Campaign, Contacts, Message } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
-import { userLogout } from "@/features/auth-user/slices/userAuthSlice";
+import { userLogout } from "@/features/user/auth-user/slices/userAuthSlice";
 import { clearUserWorkspace } from "../slice/userWorkspaceSlice";
 import type { IUserDetail } from "../types";
 import { getUserDetail } from "../service/dashboard.service";

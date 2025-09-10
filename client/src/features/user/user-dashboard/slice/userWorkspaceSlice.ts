@@ -3,7 +3,7 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import {
   type IWorkspace,
   type IWorkspaceUser,
-} from "@/features/workspace/types";
+} from "@/features/admin/workspace/types";
 
 export interface WorkspaceUserState {
   current: IWorkspace | null;

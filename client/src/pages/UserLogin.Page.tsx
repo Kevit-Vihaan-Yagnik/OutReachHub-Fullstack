@@ -1,4 +1,4 @@
-import UserLogin from "@/features/auth-user/component /UserLogin";
+import UserLogin from "@/features/user/auth-user/component /UserLogin";
 
 export default function LoginUser(){
     return <UserLogin/>

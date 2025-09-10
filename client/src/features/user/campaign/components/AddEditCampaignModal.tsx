@@ -16,11 +16,11 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useSelector } from "react-redux";
 import { type RootState } from "@/app/store";
 import { useState, useEffect } from "react";
-import type { IContact } from "@/features/contact/types";
-import { getContactsByTags } from "@/features/contact/service/contact.service";
+import type { IContact } from "@/features/user/contact/types";
+import { getContactsByTags } from "@/features/user/contact/service/contact.service";
 import { schema, type ICampaignFormData, type ICampaign } from "../types";
-import type { IMessageTemplate } from "@/features/message-template/types";
-import { getMessageTemplatesApi } from "@/features/message-template/service/messageTemplate.service";
+import type { IMessageTemplate } from "@/features/user/message-template/types";
+import { getMessageTemplatesApi } from "@/features/user/message-template/service/messageTemplate.service";
 
 interface AddCampaignModalProps {
   open: boolean;

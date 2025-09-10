@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { IUserResponse } from "../types";
-import type { ICurrentWorkspace } from "@/features/user-dashboard/types";
+import type { ICurrentWorkspace } from "@/features/user/user-dashboard/types";
 
 type UserAuthState = {
   user: IUserResponse | null;

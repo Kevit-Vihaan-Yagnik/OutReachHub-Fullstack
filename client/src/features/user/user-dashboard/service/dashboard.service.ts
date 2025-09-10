@@ -1,6 +1,6 @@
 import { get } from "@/utils/api.util";
 import type { IUserDetail } from "../types";
-import type { IWorkspace } from "@/features/workspace/types";
+import type { IWorkspace } from "@/features/admin/workspace/types";
 
 //Get User Detail
 export const getUserDetail = async (userId: string): Promise<IUserDetail> => {
