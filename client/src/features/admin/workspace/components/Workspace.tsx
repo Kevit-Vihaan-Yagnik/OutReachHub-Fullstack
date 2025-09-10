@@ -125,7 +125,7 @@ export default function Workspace() {
             dispatch(setWorkspaces(res));
             showSnackbar("Member added successfully!");
         } catch {
-            showSnackbar("Failed to add member", "error");
+            showSnackbar("Failed to add member , Member already exists", "error");
         }
     };
 

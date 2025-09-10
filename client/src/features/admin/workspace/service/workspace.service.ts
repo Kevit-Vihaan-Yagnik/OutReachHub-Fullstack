@@ -1,5 +1,5 @@
 import { del, get, patch, post } from "@/utils/api.util";
-import type { IWorkspace, IWorkspaceRow, IWorkspaceFormData, IAddMembersDto } from "../types";
+import type { IWorkspace, IWorkspaceRow, IWorkspaceFormData, IAddMembersDto, IMemberPermissions } from "../types";
 import type { ICampaign, ICampaignRow } from "../types/campaign";
 
 // 🔹 Mapper function to convert full Workspace → Row
@@ -29,6 +29,12 @@ export const addMembers = async (data: IAddMembersDto, workspaceId: string) => {
   const res = await post(`/workspace/${workspaceId}/members`, data);
   return res;
 };
+
+// 🔹 Edit members permission in a workspace
+export const editMembers = async(data : IMemberPermissions , workspaceId : string , userId : string) =>{
+  const res = await patch(`/workspace/${workspaceId}/members/${userId}` , data);
+  return res;
+}
 
 // 🔹 Get workspace by id
 export const getWorkspaceById = async (workspaceId: string) : Promise<IWorkspace> => {
