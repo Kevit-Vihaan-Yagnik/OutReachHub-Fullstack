@@ -168,9 +168,28 @@ export default function ViewCampaignModal({
               <Typography variant="subtitle2" gutterBottom>
                 Type: {campaign.templateId.type}
               </Typography>
-              <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
-                {campaign.templateId.template}
-              </Typography>
+
+              {/* Render template content */}
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
+                  {campaign.templateId.template}
+                </Typography>
+
+                {campaign.templateId.type === "text-image" &&
+                  campaign.templateId.campaignImage && (
+                    <Box sx={{ mt: 2, textAlign: "center" }}>
+                      <img
+                        src={campaign.templateId.campaignImage}
+                        alt="Campaign"
+                        style={{
+                          maxWidth: "100%",
+                          height: "auto",
+                          borderRadius: 8,
+                        }}
+                      />
+                    </Box>
+                  )}
+              </Box>
             </>
           ) : (
             <Typography>No template linked with this campaign.</Typography>

@@ -43,6 +43,7 @@ export interface ICampaignDetail {
     type: string;
     template: string;
     userId: string;
+    campaignImage? : string;
     isDeleted: boolean;
     __v: number;
   };
