@@ -171,7 +171,6 @@ export default function Workspace() {
         setPage(0);
     };
 
-    // Menu action handlers
     const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, row: IWorkspaceRow) => {
         setAnchorEl(event.currentTarget);
         setMenuRow(row);
@@ -308,7 +307,6 @@ export default function Workspace() {
                     open={openAddTags}
                     onClose={() => setOpenAddTags(false)}
                     onSubmit={(tags) => {
-                        console.log("Tags submitted:", tags, "for workspace:", selectedWorkspace?.id);
                         handleAddTags(tags)
                     }}
                 />
@@ -410,7 +408,7 @@ export default function Workspace() {
             {/* Snackbar */}
             <Snackbar
                 open={snackbar.open}
-                autoHideDuration={4000}
+                autoHideDuration={3000}
                 onClose={() => setSnackbar({ ...snackbar, open: false })}
                 anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
             >

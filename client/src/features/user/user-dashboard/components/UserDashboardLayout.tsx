@@ -27,6 +27,7 @@ import { userLogout } from "@/features/user/auth-user/slices/userAuthSlice";
 import { clearUserWorkspace } from "../slice/userWorkspaceSlice";
 import type { IUserDetail } from "../types";
 import { getUserDetail } from "../service/dashboard.service";
+import { userLogoutApi } from "../../auth-user/service/userAuth.service";
 
 const drawerWidth = 240;
 
@@ -65,11 +66,17 @@ export default function UserDashboardLayout({ children }: Props) {
       } catch (err) {
         console.error("Failed to load workspaces", err);
       }
-    };
+    };  
     loadWorkspaces();
   }, [userId]);
 
-  const handleLogout = () => {
+  const handleLogout = async() => {
+    if (userId) {
+      const data = {
+        userId: userId,
+      };
+      await userLogoutApi(data);
+    }
     dispatch(userLogout());
     dispatch(clearUserWorkspace());
     navigate("/user/login");

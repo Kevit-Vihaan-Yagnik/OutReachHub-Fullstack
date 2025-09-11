@@ -36,60 +36,85 @@ api.interceptors.request.use(
   (error: AxiosError) => Promise.reject(error)
 );
 
-// ✅ Response interceptor → handle token refresh for both admin & user
+//Queue to handle multiple failing api endpoint
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (value?: unknown) => void;
+  reject: (reason?: unknown) => void;
+}> = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+
+  failedQueue = [];
+};
+
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    if (error.response?.status === 401) {
-      const state = store.getState();
+    const originalRequest = error.config as any;
 
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      const state = store.getState();
       const adminRefresh = state.adminAuth.admin?.refresh_token;
       const userRefresh = state.userAuth.user?.refresh_token;
 
-      // ---- Handle Admin refresh ----
-      if (adminRefresh) {
-        try {
-          const res = await axios.post(`${BASE_URL}/auth/user/refresh`, {
-            refresh_token: adminRefresh,
-          });
-
-          const { access_token, refresh_token } = res.data;
-
-          store.dispatch(setTokens({ access_token, refresh_token }));
-
-          if (error.config) {
-            error.config.headers.Authorization = `Bearer ${access_token}`;
-            return api.request(error.config);
-          }
-        } catch {
-          store.dispatch(logout());
-        }
-      }
-
-      // ---- Handle User refresh ----
-      else if (userRefresh) {
-        try {
-          const res : { access_token : string, refresh_token : string }  = await axios.post(`${BASE_URL}/auth/user/refresh`, {
-            refreshToken: userRefresh,
-          });
-
-          const { access_token, refresh_token } = res;
-
-          store.dispatch(userSetTokens({ access_token, refresh_token }));
-
-          if (error.config) {
-            error.config.headers.Authorization = `Bearer ${access_token}`;
-            return api.request(error.config);
-          }
-        } catch {
-          store.dispatch(userLogout());
-        }
-      }
-
-      // No refresh token → force logout
-      else {
+      if (!adminRefresh && !userRefresh) {
         store.dispatch(logout());
         store.dispatch(userLogout());
+        return Promise.reject(error);
+      }
+
+      if (isRefreshing) {
+        // push this request into queue and wait
+        return new Promise((resolve, reject) => {
+          failedQueue.push({
+            resolve: (token) => {
+              if (originalRequest.headers) {
+                originalRequest.headers.Authorization = `Bearer ${token}`;
+              }
+              resolve(api(originalRequest));
+            },
+            reject,
+          });
+        });
+      }
+
+      isRefreshing = true;
+
+      try {
+        const res = await axios.post(`${BASE_URL}/auth/user/refresh`, {
+          refreshToken: userRefresh ?? adminRefresh,
+        });
+
+        const { access_token, refresh_token } = res.data;
+        if (userRefresh) {
+          store.dispatch(userSetTokens({ access_token, refresh_token }));
+        } else {
+          store.dispatch(setTokens({ access_token, refresh_token }));
+        }
+
+        processQueue(null, access_token);
+
+        if (originalRequest.headers) {
+          originalRequest.headers.Authorization = `Bearer ${access_token}`;
+        }
+        return api(originalRequest);
+      } catch (err) {
+        processQueue(err, null);
+        store.dispatch(logout());
+        store.dispatch(userLogout());
+        return Promise.reject(err);
+      } finally {
+        isRefreshing = false;
       }
     }
 

@@ -53,7 +53,7 @@ const Footer = () => {
               Empowering your outreach with innovative solutions.
             </Typography>
             <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
-              Email: support@outreachhub.com | Phone: +1-800-555-1234
+              Email: support@outreechub | Phone: +1-800-555-1234
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', gap: 4 }}>

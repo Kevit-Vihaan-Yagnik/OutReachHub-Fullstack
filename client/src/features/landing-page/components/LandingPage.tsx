@@ -9,11 +9,11 @@ export default function LandingPage() {
   return (
     <>
       <Navbar />
-      <HeroSection />
-      <FeatureSection/>
-      <PricingSection/>
-      <FAQSection/> 
-      <Footer/>
+      <HeroSection id="home" />
+      <FeatureSection id="features" />
+      <PricingSection id="pricing" />
+      <FAQSection id="faqs" />
+      <Footer />
     </>
-  )
+  );
 }
