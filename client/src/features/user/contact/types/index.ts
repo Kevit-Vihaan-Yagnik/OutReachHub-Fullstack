@@ -44,8 +44,8 @@ export const schema = yup.object({
     .typeError("Phone number must be a number")
     .required("Phone number is required"),
   email: yup.string().email("Invalid email").required("Email is required"),
-  company: yup.string().default(""),
-  jobTitle: yup.string().default(""),
+  company: yup.string().default("").required("Company is required"),
+  jobTitle: yup.string().default("").required("JobTitle is required"),
   tags: yup.array().of(yup.string().defined()).default([]).min(1, "Please select at least one tag") // 👈 enforce required
     .required("Please select tags"),
 });

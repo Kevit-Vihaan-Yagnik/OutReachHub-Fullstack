@@ -229,7 +229,7 @@ export default function UserDashboard() {
             </TableHead>
             <TableBody>
               {campaigns.length > 0 ? (
-                campaigns.map((c) => (
+                campaigns.slice(0,5).map((c) => (
                   <TableRow key={c._id}>
                     <TableCell>{c.name}</TableCell>
                     <TableCell>{c.status}</TableCell>

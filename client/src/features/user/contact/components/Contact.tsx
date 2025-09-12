@@ -370,6 +370,7 @@ export default function Contact() {
                 }
                 handleMenuClose();
               }}
+              sx={{ color: "error.main" }}
             >
               Delete
             </MenuItem>
