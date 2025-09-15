@@ -1,4 +1,4 @@
-import * as yup from "yup";
+import * as yup from 'yup';
 
 export interface ICampaign {
   _id: string;
@@ -8,7 +8,7 @@ export interface ICampaign {
   lastModifiedBy: string;
   name: string;
   tags: string[];
-  status: "Draft" | "Running" | "Completed";
+  status: 'Draft' | 'Running' | 'Completed';
   startDate: string;
   endDate: string;
   audienceSize: number;
@@ -22,7 +22,7 @@ export interface ICampaignFormData {
   templateId: string;
   name: string;
   tags: string[];
-  status: "Draft";
+  status: 'Draft';
   startDate: string | Date;
   endDate: string | Date;
 }
@@ -43,7 +43,7 @@ export interface ICampaignDetail {
     type: string;
     template: string;
     userId: string;
-    campaignImage? : string;
+    campaignImage?: string;
     isDeleted: boolean;
     __v: number;
   };
@@ -55,15 +55,15 @@ export interface ICampaignDetail {
   };
   name: string;
   tags: string[];
-  status: "Draft" | "Running" | "Completed"; 
-  startDate: string; 
-  endDate: string;   
+  status: 'Draft' | 'Running' | 'Completed';
+  startDate: string;
+  endDate: string;
   audienceSize: number;
   isDeleted: boolean;
-  createdAt: string; 
-  updatedAt: string; 
+  createdAt: string;
+  updatedAt: string;
   __v: number;
-  preparedAt: string; 
+  preparedAt: string;
 }
 
 export interface ICampaignRecipient {
@@ -72,14 +72,14 @@ export interface ICampaignRecipient {
   contactId: string;
   email: string;
   name: string;
-  status: "queued" | "sent" | "failed" | "delivered";
+  status: 'queued' | 'sent' | 'failed' | 'delivered';
   __v: number;
 }
 
 export interface ICampaignStartRes {
   message: string;
-  campaignId : string;
-  audienceSize : number;
+  campaignId: string;
+  audienceSize: number;
 }
 
 // {
@@ -88,30 +88,20 @@ export interface ICampaignStartRes {
 //     "audienceSize": 2
 // }
 
-
 // validation schema
 export const schema: yup.ObjectSchema<ICampaignFormData> = yup.object().shape({
-  templateId: yup.string().required("Template ID is required"),
-  name: yup.string().required("Campaign name is required"),
-  tags: yup
-    .array()
-    .of(yup.string().required())
-    .min(1, "Select at least one tag")
-    .required(),
-  status: yup.mixed<"Draft">().oneOf(["Draft"]).required(),
+  templateId: yup.string().required('Template ID is required'),
+  name: yup.string().required('Campaign name is required'),
+  tags: yup.array().of(yup.string().required()).min(1, 'Select at least one tag').required(),
+  status: yup.mixed<'Draft'>().oneOf(['Draft']).required(),
   startDate: yup
-  .date()
-  .transform((value, originalValue) =>
-    originalValue ? new Date(originalValue) : value
-  )
-  .required("Start date is required"),
+    .date()
+    .transform((value, originalValue) => (originalValue ? new Date(originalValue) : value))
+    .required('Start date is required'),
 
-endDate: yup
-  .date()
-  .transform((value, originalValue) =>
-    originalValue ? new Date(originalValue) : value
-  )
-  .min(yup.ref("startDate"), "End date cannot be before start date")
-  .required("End date is required"),
-
+  endDate: yup
+    .date()
+    .transform((value, originalValue) => (originalValue ? new Date(originalValue) : value))
+    .min(yup.ref('startDate'), 'End date cannot be before start date')
+    .required('End date is required'),
 });

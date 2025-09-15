@@ -1,61 +1,65 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {
+  Alert,
   Box,
-  TextField,
-  Typography,
+  Button,
   Chip,
-  MenuItem,
-  Select,
-  InputLabel,
   FormControl,
+  IconButton,
+  InputLabel,
+  Menu,
+  MenuItem,
+  Paper,
+  Select,
+  Snackbar,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
-  Paper,
-  Button,
-  IconButton,
-  Menu,
+  TextField,
+  Typography,
   useMediaQuery,
   useTheme,
-  TablePagination,
-  Snackbar,
-  Alert,
-} from "@mui/material";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useState, useMemo, useEffect } from "react";
-import { type ICampaign, type ICampaignFormData } from "../types";
-import { format } from "date-fns";
-import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "@/app/store";
+} from '@mui/material';
+
+import { format } from 'date-fns';
+
+import type { RootState } from '@/app/store';
+
+import {
+  createCampaignApi,
+  deleteCampaignApi,
+  getCampaignsByWorkspace,
+  getCampignDetails,
+  mapCampaignDetailToCampaign,
+  runCampaignNow,
+  updateCampaignApi,
+} from '../service/campaign.service';
 import {
   addCampaign,
   deleteCampaign,
   setCampaigns,
   setError,
   setLoading,
-} from "../slices/campaignSlice";
-import {
-  createCampaignApi,
-  getCampaignsByWorkspace,
-  runCampaignNow,
-  getCampignDetails,
-  updateCampaignApi,
-  mapCampaignDetailToCampaign,
-  deleteCampaignApi,
-} from "../service/campaign.service";
-import AddEditFormaModal from "./AddEditCampaignModal";
-import ViewCampaignModal from "./ViewCampaignModal";
-import { updateCampaign } from "../slices/campaignSlice";
-import DeleteCampaignModal from "./DeleteCampaignModal";
+} from '../slices/campaignSlice';
+import { updateCampaign } from '../slices/campaignSlice';
+import { type ICampaign, type ICampaignFormData } from '../types';
+import AddEditFormaModal from './AddEditCampaignModal';
+import DeleteCampaignModal from './DeleteCampaignModal';
+import ViewCampaignModal from './ViewCampaignModal';
 
 export default function CampaignTable() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [tagFilter, setTagFilter] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [tagFilter, setTagFilter] = useState<string>('');
 
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   // pagination state
   const [page, setPage] = useState(0);
@@ -63,18 +67,16 @@ export default function CampaignTable() {
 
   // menu state for actions
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [selectedCampaign, setSelectedCampaign] = useState<ICampaign | null>(
-    null
-  );
+  const [selectedCampaign, setSelectedCampaign] = useState<ICampaign | null>(null);
 
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
-    severity: "success" | "error";
+    severity: 'success' | 'error';
   }>({
     open: false,
-    message: "",
-    severity: "success",
+    message: '',
+    severity: 'success',
   });
 
   const handleCloseSnackbar = () => {
@@ -83,33 +85,27 @@ export default function CampaignTable() {
 
   const dispatch = useDispatch();
   const { campaigns } = useSelector((state: RootState) => state.campaign);
-  const workspaceId = useSelector(
-    (state: RootState) => state.userAuth.currentWorkspace?.id
-  );
+  const workspaceId = useSelector((state: RootState) => state.userAuth.currentWorkspace?.id);
   const permission = useSelector(
-    (state: RootState) => state.userAuth.currentWorkspace?.permission.editor
+    (state: RootState) => state.userAuth.currentWorkspace?.permission.editor,
   );
 
   const [openAdd, setOpenAdd] = useState(false);
   const [openView, setOpenView] = useState(false);
   const [startingId, setStartingId] = useState<string | null>(null);
   const [openEdit, setOpenEdit] = useState(false);
-  const [editingCampaign, setEditingCampaign] = useState<ICampaign | null>(
-    null
-  );
+  const [editingCampaign, setEditingCampaign] = useState<ICampaign | null>(null);
   const [openDelete, setOpenDelete] = useState(false);
-  const [deletingCampaign, setDeletingCampaign] = useState<ICampaign | null>(
-    null
-  );
+  const [deletingCampaign, setDeletingCampaign] = useState<ICampaign | null>(null);
 
   const handleAddCampaign = async (data: ICampaignFormData) => {
     try {
       if (!workspaceId) {
-        console.error("❌ No workspaceId found");
+        console.error('❌ No workspaceId found');
         setSnackbar({
           open: true,
-          message: "Workspace not found!",
-          severity: "error",
+          message: 'Workspace not found!',
+          severity: 'error',
         });
         return;
       }
@@ -122,17 +118,17 @@ export default function CampaignTable() {
 
       setSnackbar({
         open: true,
-        message: "✅ Campaign created successfully!",
-        severity: "success",
+        message: '✅ Campaign created successfully!',
+        severity: 'success',
       });
 
       setOpenAdd(false);
     } catch (err) {
-      console.error("❌ Failed to create campaign:", err);
+      console.error('❌ Failed to create campaign:', err);
       setSnackbar({
         open: true,
-        message: "❌ Failed to create campaign",
-        severity: "error",
+        message: '❌ Failed to create campaign',
+        severity: 'error',
       });
     }
   };
@@ -154,15 +150,15 @@ export default function CampaignTable() {
       fetchCampaigns();
       setSnackbar({
         open: true,
-        message: res.message || "✅ Campaign started successfully!",
-        severity: "success",
+        message: res.message || '✅ Campaign started successfully!',
+        severity: 'success',
       });
     } catch (err) {
-      console.error("❌ Failed to start campaign:", err);
+      console.error('❌ Failed to start campaign:', err);
       setSnackbar({
         open: true,
-        message: "❌ Failed to start campaign",
-        severity: "error",
+        message: '❌ Failed to start campaign',
+        severity: 'error',
       });
     } finally {
       setStartingId(null);
@@ -172,16 +168,12 @@ export default function CampaignTable() {
   const handleEditCampaign = async (data: ICampaignFormData) => {
     if (!workspaceId || !editingCampaign) return;
     try {
-      const updated = await updateCampaignApi(
-        editingCampaign._id,
-        workspaceId,
-        data
-      );
+      const updated = await updateCampaignApi(editingCampaign._id, workspaceId, data);
       dispatch(updateCampaign(updated));
       setSnackbar({
         open: true,
-        message: "✅ Campaign updated successfully!",
-        severity: "success",
+        message: '✅ Campaign updated successfully!',
+        severity: 'success',
       });
       setOpenEdit(false);
       fetchCampaigns();
@@ -189,10 +181,10 @@ export default function CampaignTable() {
     } catch (err) {
       setSnackbar({
         open: true,
-        message: "❌ Failed to update campaign",
-        severity: "error",
+        message: '❌ Failed to update campaign',
+        severity: 'error',
       });
-      console.error("❌ Failed to update campaign:", err);
+      console.error('❌ Failed to update campaign:', err);
     }
   };
 
@@ -203,41 +195,37 @@ export default function CampaignTable() {
       dispatch(deleteCampaign(deletingCampaign._id)); // ✅ update redux
       setSnackbar({
         open: true,
-        message: "✅ Campaign deleted successfully",
-        severity: "success",
+        message: '✅ Campaign deleted successfully',
+        severity: 'success',
       });
       setOpenDelete(false);
       setDeletingCampaign(null);
     } catch (err) {
-      console.error("❌ Failed to delete campaign:", err);
+      console.error('❌ Failed to delete campaign:', err);
       setSnackbar({
         open: true,
-        message: "❌ Failed to delete campaign",
-        severity: "error",
+        message: '❌ Failed to delete campaign',
+        severity: 'error',
       });
     }
   };
 
-  const fetchCampaigns = async () => {
+  const fetchCampaigns = useCallback(async () => {
     if (!workspaceId) return;
     try {
       dispatch(setLoading(true));
       const data = await getCampaignsByWorkspace(workspaceId);
       dispatch(setCampaigns(data));
-    } catch (err: any) {
-      console.error("❌ Failed to fetch campaigns:", err);
-      dispatch(setError("Failed to load campaigns"));
+    } catch {
+      dispatch(setError('Failed to load campaigns'));
     }
-  };
+  }, [workspaceId, dispatch]);
 
   useEffect(() => {
     fetchCampaigns();
-  }, [workspaceId, dispatch]);
+  }, [workspaceId, dispatch, fetchCampaigns]);
 
-  const handleMenuOpen = (
-    event: React.MouseEvent<HTMLButtonElement>,
-    campaign: ICampaign
-  ) => {
+  const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>, campaign: ICampaign) => {
     setAnchorEl(event.currentTarget);
     setSelectedCampaign(campaign);
   };
@@ -252,9 +240,7 @@ export default function CampaignTable() {
   // filter campaigns
   const filteredCampaigns = useMemo(() => {
     return campaigns.filter((c) => {
-      const matchesSearch = c.name
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
+      const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesTag = !tagFilter || c.tags.includes(tagFilter);
       return matchesSearch && matchesTag;
     });
@@ -267,22 +253,22 @@ export default function CampaignTable() {
   }, [filteredCampaigns, page, rowsPerPage]);
 
   // helper: status chip color
-  const getStatusColor = (status: ICampaign["status"]) => {
+  const getStatusColor = (status: ICampaign['status']) => {
     switch (status) {
-      case "Running":
-        return "success";
-      case "Completed":
-        return "info";
-      case "Draft":
+      case 'Running':
+        return 'success';
+      case 'Completed':
+        return 'info';
+      case 'Draft':
       default:
-        return "default";
+        return 'default';
     }
   };
 
   // helper: format date safely
   const formatDate = (dateStr: string) => {
     try {
-      return format(new Date(dateStr), "dd MMM yyyy");
+      return format(new Date(dateStr), 'dd MMM yyyy');
     } catch {
       return dateStr;
     }
@@ -293,11 +279,11 @@ export default function CampaignTable() {
       {/* Header */}
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
           mb: 3,
-          flexWrap: "wrap",
+          flexWrap: 'wrap',
           gap: 2,
         }}
       >
@@ -305,25 +291,21 @@ export default function CampaignTable() {
           Campaigns
         </Typography>
         {permission ? (
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => setOpenAdd(true)}
-          >
+          <Button variant="contained" color="primary" onClick={() => setOpenAdd(true)}>
             Add Campaign +
           </Button>
         ) : (
-          ""
+          ''
         )}
       </Box>
 
       {/* Filters */}
       <Box
         sx={{
-          display: "flex",
+          display: 'flex',
           gap: 2,
           mb: 3,
-          flexWrap: "wrap",
+          flexWrap: 'wrap',
         }}
       >
         <TextField
@@ -332,7 +314,7 @@ export default function CampaignTable() {
           size="small"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          sx={{ minWidth: "250px" }}
+          sx={{ minWidth: '250px' }}
         />
 
         <FormControl size="small" sx={{ minWidth: 200 }}>
@@ -390,7 +372,7 @@ export default function CampaignTable() {
 
                 {/* Start Button Column */}
                 <TableCell align="center">
-                  {campaign.status === "Draft" && (
+                  {campaign.status === 'Draft' && (
                     <Button
                       size="small"
                       color="success"
@@ -398,15 +380,15 @@ export default function CampaignTable() {
                       disabled={startingId === campaign._id}
                       onClick={() => handleStartCampaign(campaign._id)}
                     >
-                      {startingId === campaign._id ? "Starting..." : "Start"}
+                      {startingId === campaign._id ? 'Starting...' : 'Start'}
                     </Button>
                   )}
-                  {campaign.status === "Running" && (
+                  {campaign.status === 'Running' && (
                     <Button size="small" color="success" disabled>
                       Running
                     </Button>
                   )}
-                  {campaign.status === "Completed" && (
+                  {campaign.status === 'Completed' && (
                     <Button size="small" color="info" disabled>
                       Completed
                     </Button>
@@ -415,10 +397,7 @@ export default function CampaignTable() {
 
                 {/* Actions Column */}
                 <TableCell align="center">
-                  <IconButton
-                    size="small"
-                    onClick={(e) => handleMenuOpen(e, campaign)}
-                  >
+                  <IconButton size="small" onClick={(e) => handleMenuOpen(e, campaign)}>
                     <MoreVertIcon />
                   </IconButton>
                 </TableCell>
@@ -481,13 +460,9 @@ export default function CampaignTable() {
           open={snackbar.open}
           autoHideDuration={4000}
           onClose={handleCloseSnackbar}
-          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         >
-          <Alert
-            onClose={handleCloseSnackbar}
-            severity={snackbar.severity}
-            sx={{ width: "100%" }}
-          >
+          <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
             {snackbar.message}
           </Alert>
         </Snackbar>
@@ -508,11 +483,7 @@ export default function CampaignTable() {
       </TableContainer>
 
       {/* Action Menu */}
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-      >
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         <MenuItem
           onClick={() => {
             if (selectedCampaign) {
@@ -527,14 +498,14 @@ export default function CampaignTable() {
           <div>
             <MenuItem
               onClick={() => {
-                if (selectedCampaign?.status === "Draft") {
+                if (selectedCampaign?.status === 'Draft') {
                   setEditingCampaign(selectedCampaign);
                   setOpenEdit(true);
                 } else {
                   setSnackbar({
                     open: true,
-                    message: "Campaign already in running mode!",
-                    severity: "error",
+                    message: 'Campaign already in running mode!',
+                    severity: 'error',
                   });
                 }
                 handleMenuClose();
@@ -544,25 +515,25 @@ export default function CampaignTable() {
             </MenuItem>
             <MenuItem
               onClick={() => {
-                if (selectedCampaign?.status === "Draft") {
+                if (selectedCampaign?.status === 'Draft') {
                   setDeletingCampaign(selectedCampaign);
                   setOpenDelete(true);
                 } else {
                   setSnackbar({
                     open: true,
-                    message: "Campaign already in running mode!",
-                    severity: "error",
+                    message: 'Campaign already in running mode!',
+                    severity: 'error',
                   });
                 }
                 handleMenuClose();
               }}
-              sx={{ color: "error.main" }}
+              sx={{ color: 'error.main' }}
             >
               Delete
             </MenuItem>
           </div>
         ) : (
-          ""
+          ''
         )}
       </Menu>
     </Box>

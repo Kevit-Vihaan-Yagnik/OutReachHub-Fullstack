@@ -1,16 +1,15 @@
-import { del, get, patch, post } from "@/utils/api.util";
-import type { IContact, IContactFormData, IContactResponse } from "../types";
+import { del, get, patch, post } from '@/utils/api.util';
 
-export const getContactsByWorkspace = async (
-  workspaceId: string
-): Promise<IContact[]> => {
+import type { IContact, IContactFormData, IContactResponse } from '../types';
+
+export const getContactsByWorkspace = async (workspaceId: string): Promise<IContact[]> => {
   const res: IContactResponse = await get(`/contact/${workspaceId}`);
   return res.data;
 };
 
 export const addContactToWorkspace = async (
   workspaceId: string,
-  data: IContactFormData
+  data: IContactFormData,
 ): Promise<IContact> => {
   const body = {
     contacts: [
@@ -29,23 +28,22 @@ export const addContactToWorkspace = async (
     ],
   };
 
-  const res: { data: IContact[]; message: string } = await post(
-    `/contact/${workspaceId}`,
-    body
-  );
+  const res: { data: IContact[]; message: string } = await post(`/contact/${workspaceId}`, body);
 
   return res.data[0]!;
 };
 
-export const getContactById = async (workspaceId : string , contactId: string): Promise<IContact> => {
-  const res: { message: string; data: IContact } = await get(`/contact/${workspaceId}/${contactId}`);
+export const getContactById = async (workspaceId: string, contactId: string): Promise<IContact> => {
+  const res: { message: string; data: IContact } = await get(
+    `/contact/${workspaceId}/${contactId}`,
+  );
   return res.data;
 };
 
 export const updateContactApi = async (
   workspaceId: string,
   contactId: string,
-  data: IContactFormData
+  data: IContactFormData,
 ): Promise<IContact> => {
   // 🔹 Transform IContactFormData into the API payload shape
   const payload = {
@@ -63,17 +61,22 @@ export const updateContactApi = async (
 
   const res: { message: string; data: IContact } = await patch(
     `/contact/${workspaceId}/${contactId}`,
-    payload
+    payload,
   );
 
   return res.data;
 };
 
-export const deleteContactApi = async(workspaceId : string , contactId : string) : Promise<string> => {
-  const res : {message: string , data : IContact} = await del(`/contact/${workspaceId}/${contactId}`);
-  return res.message
-}
+export const deleteContactApi = async (workspaceId: string, contactId: string): Promise<string> => {
+  const res: { message: string; data: IContact } = await del(
+    `/contact/${workspaceId}/${contactId}`,
+  );
+  return res.message;
+};
 
-export const getContactsByTags = async (workspaceId : string , data : {tags : string[]}) : Promise<IContact[]>=>{
-  return await post(`/contact/filterTags/${workspaceId}` , data)
-}
+export const getContactsByTags = async (
+  workspaceId: string,
+  data: { tags: string[] },
+): Promise<IContact[]> => {
+  return await post(`/contact/filterTags/${workspaceId}`, data);
+};

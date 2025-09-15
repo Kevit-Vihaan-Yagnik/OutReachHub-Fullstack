@@ -1,15 +1,18 @@
+import { Controller, useForm } from 'react-hook-form';
+
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
   Autocomplete,
+  AutocompleteRenderInputParams,
+  Button,
   Chip,
-} from "@mui/material";
-import { useForm, Controller } from "react-hook-form";
-import type { IWorkspaceFormData } from "../types";
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+} from '@mui/material';
+
+import type { IWorkspaceFormData } from '../types';
 
 interface FormModalProps {
   open: boolean;
@@ -17,13 +20,13 @@ interface FormModalProps {
   onSubmit: (data: IWorkspaceFormData) => void;
 }
 
-const availableTags = ["marketing", "design", "leads", "email", "sales"];
+const availableTags = ['marketing', 'design', 'leads', 'email', 'sales'];
 
 export default function FormModal({ open, onClose, onSubmit }: FormModalProps) {
   const { control, handleSubmit, reset } = useForm<IWorkspaceFormData>({
     defaultValues: {
-      name: "",
-      description: "",
+      name: '',
+      description: '',
       tags: [],
     },
   });
@@ -42,7 +45,7 @@ export default function FormModal({ open, onClose, onSubmit }: FormModalProps) {
         <Controller
           name="name"
           control={control}
-          rules={{ required: "Name is required" }}
+          rules={{ required: 'Name is required' }}
           render={({ field, fieldState }) => (
             <TextField
               {...field}
@@ -59,7 +62,7 @@ export default function FormModal({ open, onClose, onSubmit }: FormModalProps) {
         <Controller
           name="description"
           control={control}
-          rules={{ required: "Description is required" }}
+          rules={{ required: 'Description is required' }}
           render={({ field, fieldState }) => (
             <TextField
               {...field}
@@ -94,11 +97,11 @@ export default function FormModal({ open, onClose, onSubmit }: FormModalProps) {
                   />
                 ))
               }
-              renderInput={(params) => {
+              renderInput={(params: AutocompleteRenderInputParams) => {
                 return (
                   <TextField
-                    {...params as any}
-                    size='small'
+                    {...(params as { size: string })}
+                    size="medium"
                     label="Tags"
                     placeholder="Select tags"
                   />

@@ -1,14 +1,15 @@
+import { useState } from 'react';
+
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
   Box,
+  Button,
   Chip,
-} from "@mui/material";
-import { useState } from "react";
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+} from '@mui/material';
 
 interface AddTagsModalProps {
   open: boolean;
@@ -24,15 +25,15 @@ export default function AddTagsModal({
   initialTags = [],
 }: AddTagsModalProps) {
   const [tags, setTags] = useState<string[]>(initialTags);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState('');
 
   const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && inputValue.trim()) {
+    if (e.key === 'Enter' && inputValue.trim()) {
       e.preventDefault();
       if (!tags.includes(inputValue.trim())) {
         setTags([...tags, inputValue.trim()]);
       }
-      setInputValue("");
+      setInputValue('');
     }
   };
 

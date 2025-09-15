@@ -1,5 +1,5 @@
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 /**
  * Generates and downloads a sample Excel file.
@@ -10,15 +10,12 @@ import { saveAs } from "file-saver";
 export const downloadSampleExcel = (
   fileName: string,
   sheetName: string,
-  sampleData: Record<string, any>[]
+  sampleData: Record<string, string | number>[],
 ) => {
   const worksheet = XLSX.utils.json_to_sheet(sampleData);
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
 
-  const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-  saveAs(
-    new Blob([excelBuffer], { type: "application/octet-stream" }),
-    `${fileName}.xlsx`
-  );
+  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  saveAs(new Blob([excelBuffer], { type: 'application/octet-stream' }), `${fileName}.xlsx`);
 };

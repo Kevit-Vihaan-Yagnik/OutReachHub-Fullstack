@@ -1,32 +1,36 @@
+import { useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { useSelector } from 'react-redux';
+
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
   Autocomplete,
-  Typography,
-  CircularProgress,
   Box,
+  Button,
   Chip,
-} from "@mui/material";
-import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useSelector } from "react-redux";
-import { type RootState } from "@/app/store";
-import { useState, useEffect } from "react";
-import type { IContact } from "@/features/user/contact/types";
-import { getContactsByTags } from "@/features/user/contact/service/contact.service";
-import { schema, type ICampaignFormData, type ICampaign } from "../types";
-import type { IMessageTemplate } from "@/features/user/message-template/types";
-import { getMessageTemplatesApi } from "@/features/user/message-template/service/messageTemplate.service";
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  Typography,
+} from '@mui/material';
+
+import { yupResolver } from '@hookform/resolvers/yup';
+
+import { type RootState } from '@/app/store';
+import { getContactsByTags } from '@/features/user/contact/service/contact.service';
+import type { IContact } from '@/features/user/contact/types';
+import { getMessageTemplatesApi } from '@/features/user/message-template/service/messageTemplate.service';
+import type { IMessageTemplate } from '@/features/user/message-template/types';
+
+import { type ICampaign, type ICampaignFormData, schema } from '../types';
 
 interface AddCampaignModalProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (data: ICampaignFormData, contacts: IContact[]) => void;
-  mode?: "add" | "edit";
+  mode?: 'add' | 'edit';
   campaign?: ICampaign;
 }
 
@@ -34,15 +38,13 @@ export default function AddEditCampaignModal({
   open,
   onClose,
   onSubmit,
-  mode = "add",
+  mode = 'add',
   campaign,
 }: AddCampaignModalProps) {
-  const isEdit = mode === "edit";
+  const isEdit = mode === 'edit';
 
   // 🔹 Workspace tags from Redux
-  const workspaceTags = useSelector(
-    (state: RootState) => state.userWorkspace.tags
-  );
+  const workspaceTags = useSelector((state: RootState) => state.userWorkspace.tags);
 
   const {
     control,
@@ -53,12 +55,12 @@ export default function AddEditCampaignModal({
   } = useForm<ICampaignFormData>({
     resolver: yupResolver(schema),
     defaultValues: {
-      templateId: "",
-      name: "",
+      templateId: '',
+      name: '',
       tags: [],
-      status: "Draft",
-      startDate: "",
-      endDate: "",
+      status: 'Draft',
+      startDate: '',
+      endDate: '',
     },
   });
 
@@ -72,25 +74,21 @@ export default function AddEditCampaignModal({
         status: 'Draft',
         startDate: campaign.startDate
           ? new Date(campaign.startDate).toISOString().slice(0, 16)
-          : "",
-        endDate: campaign.endDate
-          ? new Date(campaign.endDate).toISOString().slice(0, 16)
-          : "",
+          : '',
+        endDate: campaign.endDate ? new Date(campaign.endDate).toISOString().slice(0, 16) : '',
       });
     }
   }, [isEdit, campaign, reset]);
 
   // watch selected tags
-  const selectedTags = watch("tags");
+  const selectedTags = watch('tags');
 
   // contacts preview
   const [contacts, setContacts] = useState<IContact[]>([]);
   const [loadingContacts, setLoadingContacts] = useState(false);
 
   // get workspaceId from Redux
-  const workspaceId = useSelector(
-    (state: RootState) => state.userWorkspace.current?._id
-  );
+  const workspaceId = useSelector((state: RootState) => state.userWorkspace.current?._id);
 
   useEffect(() => {
     const fetchContacts = async () => {
@@ -105,7 +103,7 @@ export default function AddEditCampaignModal({
         });
         setContacts(data);
       } catch (err) {
-        console.error("❌ Failed to fetch contacts by tags:", err);
+        console.error('❌ Failed to fetch contacts by tags:', err);
       } finally {
         setLoadingContacts(false);
       }
@@ -125,7 +123,7 @@ export default function AddEditCampaignModal({
         const data = await getMessageTemplatesApi(workspaceId);
         setTemplates(data);
       } catch (err) {
-        console.error("❌ Failed to fetch message templates:", err);
+        console.error('❌ Failed to fetch message templates:', err);
       } finally {
         setLoadingTemplates(false);
       }
@@ -139,13 +137,11 @@ export default function AddEditCampaignModal({
     onClose();
   };
 
-  const isDraft = campaign?.status === "Draft" || !isEdit;
+  const isDraft = campaign?.status === 'Draft' || !isEdit;
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>
-        {isEdit ? "Edit Campaign" : "Add Campaign"}
-      </DialogTitle>
+      <DialogTitle>{isEdit ? 'Edit Campaign' : 'Add Campaign'}</DialogTitle>
       <DialogContent>
         <Controller
           name="templateId"
@@ -154,16 +150,15 @@ export default function AddEditCampaignModal({
             <Autocomplete
               {...field}
               options={templates}
-              getOptionLabel={(option) =>
-                typeof option === "string" ? option : option.title
-              }
+              getOptionLabel={(option) => (typeof option === 'string' ? option : option.title)}
               value={templates.find((t) => t._id === field.value) || null}
-              onChange={(_, value) => field.onChange(value ? value._id : "")}
+              onChange={(_, value) => field.onChange(value ? value._id : '')}
               loading={loadingTemplates}
               disabled={!isDraft}
               renderInput={(params) => (
                 <TextField
-                  {...params as any}
+                  {...(params as { size: string })}
+                  size="medium"
                   label="Select Template"
                   margin="normal"
                   fullWidth
@@ -205,16 +200,13 @@ export default function AddEditCampaignModal({
               disabled={!isDraft}
               renderTags={(value: string[], getTagProps) =>
                 value.map((option: string, index: number) => (
-                  <Chip
-                    label={option}
-                    {...getTagProps({ index })}
-                    key={option}
-                  />
+                  <Chip label={option} {...getTagProps({ index })} key={option} />
                 ))
               }
               renderInput={(params) => (
                 <TextField
-                  {...params as any}
+                  {...(params as { size: string })}
+                  size="medium"
                   label="Select Tags"
                   margin="normal"
                   error={!!errors.tags}
@@ -233,7 +225,7 @@ export default function AddEditCampaignModal({
           {loadingContacts ? (
             <CircularProgress size={24} />
           ) : contacts.length > 0 ? (
-            <Box sx={{ maxHeight: 150, overflowY: "auto" }}>
+            <Box sx={{ maxHeight: 150, overflowY: 'auto' }}>
               {contacts.map((c) => (
                 <Typography key={c._id} variant="body2">
                   {c.name} ({c.contactInfo.email})
@@ -289,12 +281,8 @@ export default function AddEditCampaignModal({
           Cancel
         </Button>
         {isDraft && (
-          <Button
-            onClick={handleSubmit(handleFormSubmit)}
-            variant="contained"
-            color="primary"
-          >
-            {isEdit ? "Update" : "Add"}
+          <Button onClick={handleSubmit(handleFormSubmit)} variant="contained" color="primary">
+            {isEdit ? 'Update' : 'Add'}
           </Button>
         )}
       </DialogActions>

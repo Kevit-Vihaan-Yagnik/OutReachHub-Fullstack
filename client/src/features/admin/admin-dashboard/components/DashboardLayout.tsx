@@ -1,4 +1,11 @@
-import * as React from "react";
+import * as React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+
+import { Workspaces } from '@mui/icons-material';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import LogoutIcon from '@mui/icons-material/Logout';
+import MenuIcon from '@mui/icons-material/Menu';
 import {
   AppBar,
   Box,
@@ -13,15 +20,10 @@ import {
   Toolbar,
   Typography,
   useTheme,
-} from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import LogoutIcon from "@mui/icons-material/Logout";
-import { useNavigate } from "react-router-dom";
-import { Workspaces } from "@mui/icons-material";
-import { useDispatch, useSelector } from "react-redux";
-import { logout } from "@/features/admin/auth/slices/adminAuthSlice";
-import type { RootState } from "@/app/store";
+} from '@mui/material';
+
+import type { RootState } from '@/app/store';
+import { logout } from '@/features/admin/auth/slices/adminAuthSlice';
 
 const drawerWidth = 240;
 
@@ -41,30 +43,25 @@ export default function DashboardLayout({ children }: Props) {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate("/admin/login");
+    navigate('/admin/login');
   };
 
   const drawer = (
     <Box>
       <Toolbar>
-        <Typography
-          variant="h6"
-          noWrap
-          component="div"
-          sx={{ fontWeight: 700 }}
-        >
+        <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 700 }}>
           OutReachHub
         </Typography>
       </Toolbar>
       <Divider />
       <List>
-        <ListItemButton onClick={() => navigate("/admin/dashboard")}>
+        <ListItemButton onClick={() => navigate('/admin/dashboard')}>
           <ListItemIcon>
             <DashboardIcon color="primary" />
           </ListItemIcon>
           <ListItemText primary="Dashboard" />
         </ListItemButton>
-        <ListItemButton onClick={() => navigate("/admin/dashboard/workspace")}>
+        <ListItemButton onClick={() => navigate('/admin/dashboard/workspace')}>
           <ListItemIcon>
             <Workspaces color="primary" />
           </ListItemIcon>
@@ -81,7 +78,7 @@ export default function DashboardLayout({ children }: Props) {
   );
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       {/* AppBar */}
       <AppBar
@@ -101,7 +98,7 @@ export default function DashboardLayout({ children }: Props) {
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: "none" } }}
+            sx={{ mr: 2, display: { sm: 'none' } }}
           >
             <MenuIcon />
           </IconButton>
@@ -134,9 +131,9 @@ export default function DashboardLayout({ children }: Props) {
           onClose={handleDrawerToggle}
           ModalProps={{ keepMounted: true }}
           sx={{
-            display: { xs: "block", sm: "none" },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
+            display: { xs: 'block', sm: 'none' },
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
               width: drawerWidth,
             },
           }}
@@ -148,9 +145,9 @@ export default function DashboardLayout({ children }: Props) {
         <Drawer
           variant="permanent"
           sx={{
-            display: { xs: "none", sm: "block" },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
+            display: { xs: 'none', sm: 'block' },
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
               width: drawerWidth,
             },
           }}

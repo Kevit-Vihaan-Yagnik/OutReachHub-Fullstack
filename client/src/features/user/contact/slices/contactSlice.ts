@@ -1,6 +1,7 @@
 // features/contact/slices/contactSlice.ts
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { IContact } from "../types";
+import { type PayloadAction, createSlice } from '@reduxjs/toolkit';
+
+import type { IContact } from '../types';
 
 export interface ContactState {
   contacts: IContact[];
@@ -15,7 +16,7 @@ const initialState: ContactState = {
 };
 
 const contactSlice = createSlice({
-  name: "contact",
+  name: 'contact',
   initialState,
   reducers: {
     setContacts(state, action: PayloadAction<IContact[]>) {

@@ -1,5 +1,6 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { ICampaign } from "../types";
+import { type PayloadAction, createSlice } from '@reduxjs/toolkit';
+
+import type { ICampaign } from '../types';
 
 export interface CampaignState {
   campaigns: ICampaign[];
@@ -14,7 +15,7 @@ const initialState: CampaignState = {
 };
 
 const campaignSlice = createSlice({
-  name: "campaign",
+  name: 'campaign',
   initialState,
   reducers: {
     setCampaigns(state, action: PayloadAction<ICampaign[]>) {
@@ -26,17 +27,13 @@ const campaignSlice = createSlice({
       state.campaigns.push(action.payload);
     },
     updateCampaign(state, action: PayloadAction<ICampaign>) {
-      const idx = state.campaigns.findIndex(
-        (c) => c._id === action.payload._id
-      );
+      const idx = state.campaigns.findIndex((c) => c._id === action.payload._id);
       if (idx !== -1) {
         state.campaigns[idx] = action.payload;
       }
     },
     deleteCampaign(state, action: PayloadAction<string>) {
-      state.campaigns = state.campaigns.filter(
-        (c) => c._id !== action.payload
-      );
+      state.campaigns = state.campaigns.filter((c) => c._id !== action.payload);
     },
     setLoading(state, action: PayloadAction<boolean>) {
       state.loading = action.payload;

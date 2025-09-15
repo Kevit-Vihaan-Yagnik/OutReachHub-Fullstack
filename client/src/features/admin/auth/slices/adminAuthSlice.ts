@@ -28,10 +28,7 @@ const adminAuthSlice = createSlice({
       state.admin = null;
       localStorage.removeItem('adminAuth');
     },
-    setTokens: (
-      state,
-      action: PayloadAction<{ access_token: string; refresh_token: string }>
-    ) => {
+    setTokens: (state, action: PayloadAction<{ access_token: string; refresh_token: string }>) => {
       if (state.admin) {
         state.admin.access_token = action.payload.access_token;
         state.admin.refresh_token = action.payload.refresh_token;

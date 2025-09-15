@@ -1,6 +1,7 @@
-import { get } from "@/utils/api.util";
-import type { IUserDetail } from "../types";
-import type { IWorkspace } from "@/features/admin/workspace/types";
+import type { IWorkspace } from '@/features/admin/workspace/types';
+import { get } from '@/utils/api.util';
+
+import type { IUserDetail } from '../types';
 
 //Get User Detail
 export const getUserDetail = async (userId: string): Promise<IUserDetail> => {
@@ -8,8 +9,6 @@ export const getUserDetail = async (userId: string): Promise<IUserDetail> => {
 };
 
 //GetWorkspace By Id
-export const getWorkspaceById = async (workspaceId : string) : Promise<IWorkspace> => {
-    return await get(`/workspace/${workspaceId}`);
-}
-
-
+export const getWorkspaceById = async (workspaceId: string): Promise<IWorkspace> => {
+  return await get(`/workspace/${workspaceId}`);
+};

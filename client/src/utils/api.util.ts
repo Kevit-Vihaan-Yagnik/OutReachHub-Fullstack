@@ -1,20 +1,22 @@
-import { store } from "@/app/store";
-import {
-  userLogout,
-  userSetTokens,
-} from "@/features/user/auth-user/slices/userAuthSlice";
-import { logout, setTokens } from "@/features/admin/auth/slices/adminAuthSlice";
-import axios, { AxiosError } from "axios";
-import type { AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, { AxiosError } from 'axios';
+import type { AxiosRequestConfig, AxiosResponse } from 'axios';
+
+import { store } from '@/app/store';
+import { logout, setTokens } from '@/features/admin/auth/slices/adminAuthSlice';
+import { userLogout, userSetTokens } from '@/features/user/auth-user/slices/userAuthSlice';
 
 // Base URL for API (configurable based on environment)
 const BASE_URL = import.meta.env.VITE_API_URL;
+
+interface CustomAxiosRequestConfig extends AxiosRequestConfig {
+  _retry?: boolean;
+}
 
 // Create an Axios instance
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
 });
 
@@ -33,7 +35,7 @@ api.interceptors.request.use(
 
     return config;
   },
-  (error: AxiosError) => Promise.reject(error)
+  (error: AxiosError) => Promise.reject(error),
 );
 
 //Queue to handle multiple failing api endpoint
@@ -43,7 +45,7 @@ let failedQueue: Array<{
   reject: (reason?: unknown) => void;
 }> = [];
 
-const processQueue = (error: any, token: string | null = null) => {
+const processQueue = (error: Error | null, token: string | null = null) => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
@@ -58,7 +60,7 @@ const processQueue = (error: any, token: string | null = null) => {
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const originalRequest = error.config as any;
+    const originalRequest = error.config as CustomAxiosRequestConfig;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
@@ -109,7 +111,8 @@ api.interceptors.response.use(
         }
         return api(originalRequest);
       } catch (err) {
-        processQueue(err, null);
+        const errorToProcess = err instanceof Error ? err : new Error('An unknown error occurred');
+        processQueue(errorToProcess, null);
         store.dispatch(logout());
         store.dispatch(userLogout());
         return Promise.reject(err);
@@ -119,17 +122,14 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 // Generic types for API responses
 export type ApiResponse<T> = T;
 
 // Generic GET request
-export const get = async <T>(
-  url: string,
-  config?: AxiosRequestConfig
-): Promise<ApiResponse<T>> => {
+export const get = async <T>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> => {
   try {
     const response: AxiosResponse<ApiResponse<T>> = await api.get(url, config);
     return response.data;
@@ -142,14 +142,10 @@ export const get = async <T>(
 export const post = async <T, B>(
   url: string,
   data: B,
-  config?: AxiosRequestConfig
+  config?: AxiosRequestConfig,
 ): Promise<ApiResponse<T>> => {
   try {
-    const response: AxiosResponse<ApiResponse<T>> = await api.post(
-      url,
-      data,
-      config
-    );
+    const response: AxiosResponse<ApiResponse<T>> = await api.post(url, data, config);
     return response.data;
   } catch (error) {
     throw handleError(error);
@@ -160,14 +156,10 @@ export const post = async <T, B>(
 export const patch = async <T, B>(
   url: string,
   data: B,
-  config?: AxiosRequestConfig
+  config?: AxiosRequestConfig,
 ): Promise<ApiResponse<T>> => {
   try {
-    const response: AxiosResponse<ApiResponse<T>> = await api.patch(
-      url,
-      data,
-      config
-    );
+    const response: AxiosResponse<ApiResponse<T>> = await api.patch(url, data, config);
     return response.data;
   } catch (error) {
     throw handleError(error);
@@ -175,15 +167,9 @@ export const patch = async <T, B>(
 };
 
 // Generic DELETE request
-export const del = async <T>(
-  url: string,
-  config?: AxiosRequestConfig
-): Promise<ApiResponse<T>> => {
+export const del = async <T>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> => {
   try {
-    const response: AxiosResponse<ApiResponse<T>> = await api.delete(
-      url,
-      config
-    );
+    const response: AxiosResponse<ApiResponse<T>> = await api.delete(url, config);
     return response.data;
   } catch (error) {
     throw handleError(error);
@@ -194,7 +180,7 @@ export const del = async <T>(
 const handleError = (error: unknown): Error => {
   if (axios.isAxiosError(error)) {
     const axiosError = error as AxiosError;
-    return new Error(axiosError.message || "An error occurred");
+    return new Error(axiosError.message || 'An error occurred');
   }
-  return new Error("An unexpected error occurred");
+  return new Error('An unexpected error occurred');
 };

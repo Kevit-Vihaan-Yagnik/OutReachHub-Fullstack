@@ -1,31 +1,33 @@
+import { useEffect, useState } from 'react';
+
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Tabs,
-  Tab,
+  Alert,
   Box,
-  Typography,
+  Button,
+  Checkbox,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControlLabel,
+  Grid,
   List,
   ListItem,
   ListItemText,
-  CircularProgress,
-  FormControlLabel,
-  Checkbox,
   Snackbar,
-  Alert,
-  Grid,
-} from "@mui/material";
-import { useEffect, useState } from "react";
+  Tab,
+  Tabs,
+  Typography,
+} from '@mui/material';
+
 import {
   editMembers,
   getCampaignsByWorkspace,
   getWorkspaceById,
-} from "../service/workspace.service";
-import type { IMemberPermissions, IWorkspace, IWorkspaceUser } from "../types";
-import type { ICampaignRow } from "../types/campaign";
+} from '../service/workspace.service';
+import type { IMemberPermissions, IWorkspace, IWorkspaceUser } from '../types';
+import type { ICampaignRow } from '../types/campaign';
 
 interface ViewWorkspaceModalProps {
   open: boolean;
@@ -42,18 +44,16 @@ export default function ViewWorkspaceModal({
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState(0);
   const [campaigns, setCampaigns] = useState<ICampaignRow[]>([]);
-  const [permissionsState, setPermissionsState] = useState<
-    Record<string, IMemberPermissions>
-  >({});
+  const [permissionsState, setPermissionsState] = useState<Record<string, IMemberPermissions>>({});
 
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
-    severity: "success" | "error";
+    severity: 'success' | 'error';
   }>({
     open: false,
-    message: "",
-    severity: "success",
+    message: '',
+    severity: 'success',
   });
 
   const handleSnackbarClose = () => {
@@ -64,22 +64,22 @@ export default function ViewWorkspaceModal({
   const handleSavePermissions = async (
     workspaceId: string,
     userId: string,
-    permissions: IMemberPermissions
+    permissions: IMemberPermissions,
   ) => {
     try {
       await editMembers(permissions, workspaceId, userId);
       setSnackbar({
         open: true,
-        message: "Permissions updated successfully!",
-        severity: "success",
+        message: 'Permissions updated successfully!',
+        severity: 'success',
       });
       fetchWorkspace(); // refresh workspace data
     } catch (err) {
       console.error(err);
       setSnackbar({
         open: true,
-        message: "Failed to update permissions",
-        severity: "error",
+        message: 'Failed to update permissions',
+        severity: 'error',
       });
     }
   };
@@ -93,11 +93,9 @@ export default function ViewWorkspaceModal({
       // preload permissions state
       const initialPermissions: Record<string, IMemberPermissions> = {};
       res.users.forEach((user) => {
-        if (typeof user !== "string") {
+        if (typeof user !== 'string') {
           const u = user as IWorkspaceUser;
-          const wsPermission = u.workspaces.find(
-            (w) => w.workspaceId === workspaceId
-          );
+          const wsPermission = u.workspaces.find((w) => w.workspaceId === workspaceId);
           initialPermissions[u._id] = {
             viewer: wsPermission?.permission?.viewer ?? false,
             editor: wsPermission?.permission?.editor ?? false,
@@ -107,7 +105,7 @@ export default function ViewWorkspaceModal({
       });
       setPermissionsState(initialPermissions);
     } catch (err) {
-      console.error("Failed to fetch workspace:", err);
+      console.error('Failed to fetch workspace:', err);
     } finally {
       setLoading(false);
     }
@@ -128,11 +126,9 @@ export default function ViewWorkspaceModal({
           // preload permissions
           const initialPermissions: Record<string, IMemberPermissions> = {};
           ws.users.forEach((user) => {
-            if (typeof user !== "string") {
+            if (typeof user !== 'string') {
               const u = user as IWorkspaceUser;
-              const wsPermission = u.workspaces.find(
-                (w) => w.workspaceId === workspaceId
-              );
+              const wsPermission = u.workspaces.find((w) => w.workspaceId === workspaceId);
               initialPermissions[u._id] = {
                 viewer: wsPermission?.permission?.viewer ?? false,
                 editor: wsPermission?.permission?.editor ?? false,
@@ -142,7 +138,7 @@ export default function ViewWorkspaceModal({
           });
           setPermissionsState(initialPermissions);
         } catch (err) {
-          console.log(err);
+          return err;
         } finally {
           setLoading(false);
         }
@@ -170,7 +166,7 @@ export default function ViewWorkspaceModal({
       <DialogTitle>View Workspace</DialogTitle>
       <DialogContent dividers>
         {loading ? (
-          <Grid textAlign={"center"}>
+          <Grid textAlign={'center'}>
             <CircularProgress />
           </Grid>
         ) : workspace ? (
@@ -190,12 +186,9 @@ export default function ViewWorkspaceModal({
                   <Typography variant="h6">{workspace.name}</Typography>
                   <Typography>{workspace.description}</Typography>
                   <Typography variant="body2" sx={{ mt: 2 }}>
-                    Created on:{" "}
-                    {new Date(workspace.creationDate).toLocaleDateString()}
+                    Created on: {new Date(workspace.creationDate).toLocaleDateString()}
                   </Typography>
-                  <Typography variant="body2">
-                    Creator: {workspace.creator}
-                  </Typography>
+                  <Typography variant="body2">Creator: {workspace.creator}</Typography>
                 </Box>
               )}
 
@@ -204,12 +197,12 @@ export default function ViewWorkspaceModal({
                 <List
                   sx={{
                     maxHeight: 300,
-                    overflowY: "auto",
+                    overflowY: 'auto',
                     mt: 1,
                   }}
                 >
                   {workspace.users.map((user) => {
-                    if (typeof user === "string") return null;
+                    if (typeof user === 'string') return null;
                     const u = user as IWorkspaceUser;
                     const userPermissions = permissionsState[u._id] || {
                       viewer: false,
@@ -223,8 +216,7 @@ export default function ViewWorkspaceModal({
                           primary={u.name}
                           secondary={
                             <>
-                              {u.contactInfo.email} |{" "}
-                              {u.contactInfo.countryCode}
+                              {u.contactInfo.email} | {u.contactInfo.countryCode}
                               {u.contactInfo.phoneNo}
                             </>
                           }
@@ -234,17 +226,15 @@ export default function ViewWorkspaceModal({
                         <Box
                           display="flex"
                           gap={1}
-                          flexDirection={{ xs: "column", sm: "row" }}
-                          alignItems={{ xs: "flex-start", sm: "center" }}
-                          flexWrap={"wrap"}
+                          flexDirection={{ xs: 'column', sm: 'row' }}
+                          alignItems={{ xs: 'flex-start', sm: 'center' }}
+                          flexWrap={'wrap'}
                         >
                           <FormControlLabel
                             control={
                               <Checkbox
                                 checked={userPermissions.viewer ?? false}
-                                onChange={() =>
-                                  togglePermission(u._id, "viewer")
-                                }
+                                onChange={() => togglePermission(u._id, 'viewer')}
                               />
                             }
                             label="Viewer"
@@ -253,9 +243,7 @@ export default function ViewWorkspaceModal({
                             control={
                               <Checkbox
                                 checked={userPermissions.editor ?? false}
-                                onChange={() =>
-                                  togglePermission(u._id, "editor")
-                                }
+                                onChange={() => togglePermission(u._id, 'editor')}
                               />
                             }
                             label="Editor"
@@ -264,11 +252,7 @@ export default function ViewWorkspaceModal({
                             size="small"
                             variant="contained"
                             onClick={() =>
-                              handleSavePermissions(
-                                workspaceId,
-                                u._id,
-                                userPermissions
-                              )
+                              handleSavePermissions(workspaceId, u._id, userPermissions)
                             }
                           >
                             Save
@@ -285,7 +269,7 @@ export default function ViewWorkspaceModal({
                 <List
                   sx={{
                     maxHeight: 300,
-                    overflowY: "auto",
+                    overflowY: 'auto',
                     mt: 1,
                   }}
                 >
@@ -302,7 +286,7 @@ export default function ViewWorkspaceModal({
                 <List
                   sx={{
                     maxHeight: 300,
-                    overflowY: "auto",
+                    overflowY: 'auto',
                     mt: 1,
                   }}
                 >
@@ -315,9 +299,9 @@ export default function ViewWorkspaceModal({
                           primary={`${c.name} (${c.status})`}
                           secondary={
                             <>
-                              Audience: {c.audienceSize} | Start:{" "}
-                              {new Date(c.startDate).toLocaleDateString()} |
-                              End: {new Date(c.endDate).toLocaleDateString()}
+                              Audience: {c.audienceSize} | Start:{' '}
+                              {new Date(c.startDate).toLocaleDateString()} | End:{' '}
+                              {new Date(c.endDate).toLocaleDateString()}
                             </>
                           }
                         />
@@ -341,13 +325,9 @@ export default function ViewWorkspaceModal({
         open={snackbar.open}
         autoHideDuration={3000}
         onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity={snackbar.severity}
-          sx={{ width: "100%" }}
-        >
+        <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
           {snackbar.message}
         </Alert>
       </Snackbar>

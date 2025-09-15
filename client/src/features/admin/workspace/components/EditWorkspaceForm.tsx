@@ -1,16 +1,19 @@
+import { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   TextField,
-} from "@mui/material";
-import { useForm, Controller } from "react-hook-form";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import type { IWorkspaceRow } from "../types";
-import { useEffect } from "react";
+} from '@mui/material';
+
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+
+import type { IWorkspaceRow } from '../types';
 
 interface EditWorkspaceModalProps {
   open: boolean;
@@ -21,8 +24,8 @@ interface EditWorkspaceModalProps {
 
 // 🔹 Validation schema
 const schema = yup.object({
-  name: yup.string().required("Name is required"),
-  description: yup.string().required("Description is required"),
+  name: yup.string().required('Name is required'),
+  description: yup.string().required('Description is required'),
 });
 
 export default function EditWorkspaceModal({
@@ -39,8 +42,8 @@ export default function EditWorkspaceModal({
   } = useForm<{ name: string; description: string }>({
     resolver: yupResolver(schema),
     defaultValues: {
-      name: workspace?.name || "",
-      description: workspace?.description || "",
+      name: workspace?.name || '',
+      description: workspace?.description || '',
     },
   });
 
@@ -101,11 +104,7 @@ export default function EditWorkspaceModal({
         <Button onClick={onClose} color="secondary">
           Cancel
         </Button>
-        <Button
-          onClick={handleSubmit(handleFormSubmit)}
-          variant="contained"
-          color="primary"
-        >
+        <Button onClick={handleSubmit(handleFormSubmit)} variant="contained" color="primary">
           Save
         </Button>
       </DialogActions>

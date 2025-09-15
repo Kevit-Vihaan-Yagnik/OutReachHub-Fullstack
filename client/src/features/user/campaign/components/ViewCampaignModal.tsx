@@ -1,25 +1,24 @@
+import { useEffect, useState } from 'react';
+
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Typography,
-  Chip,
   Box,
+  Button,
+  Chip,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Table,
+  TableBody,
+  TableCell,
   TableHead,
   TableRow,
-  TableCell,
-  TableBody,
-} from "@mui/material";
-import { useEffect, useState } from "react";
-import type { ICampaignDetail, ICampaignRecipient } from "../types";
-import {
-  getCampignDetails,
-  getContactOfCampaign,
-} from "../service/campaign.service";
+  Typography,
+} from '@mui/material';
+
+import { getCampignDetails, getContactOfCampaign } from '../service/campaign.service';
+import type { ICampaignDetail, ICampaignRecipient } from '../types';
 
 interface ViewCampaignModalProps {
   open: boolean;
@@ -27,11 +26,7 @@ interface ViewCampaignModalProps {
   campaignId?: string;
 }
 
-export default function ViewCampaignModal({
-  open,
-  onClose,
-  campaignId,
-}: ViewCampaignModalProps) {
+export default function ViewCampaignModal({ open, onClose, campaignId }: ViewCampaignModalProps) {
   const [campaign, setCampaign] = useState<ICampaignDetail | null>(null);
   const [recipients, setRecipients] = useState<ICampaignRecipient[]>([]);
   const [loading, setLoading] = useState(false);
@@ -47,7 +42,7 @@ export default function ViewCampaignModal({
         setCampaign(detail);
         setRecipients(Array.isArray(contacts) ? contacts : []);
       } catch (err) {
-        console.error("❌ Failed to fetch campaign details:", err);
+        console.error('❌ Failed to fetch campaign details:', err);
       } finally {
         setLoading(false);
       }
@@ -63,7 +58,7 @@ export default function ViewCampaignModal({
         <DialogTitle>Campaign Details</DialogTitle>
         <DialogContent dividers>
           {loading ? (
-            <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
               <CircularProgress />
             </Box>
           ) : campaign ? (
@@ -76,35 +71,28 @@ export default function ViewCampaignModal({
                 <Chip label={campaign.status} color="primary" />
               </Box>
               <Typography>
-                <strong>Start Date:</strong>{" "}
-                {new Date(campaign.startDate).toLocaleString()}
+                <strong>Start Date:</strong> {new Date(campaign.startDate).toLocaleString()}
               </Typography>
               <Typography>
-                <strong>End Date:</strong>{" "}
-                {new Date(campaign.endDate).toLocaleString()}
+                <strong>End Date:</strong> {new Date(campaign.endDate).toLocaleString()}
               </Typography>
               <Typography>
-                <strong>Tags:</strong> {campaign.tags.join(", ")}
+                <strong>Tags:</strong> {campaign.tags.join(', ')}
               </Typography>
               <Typography>
                 <strong>Audience Size:</strong> {campaign.audienceSize}
               </Typography>
               <Typography>
-                <strong>Created By:</strong>{" "}
-                {campaign.creator?.contactInfo?.email}
+                <strong>Created By:</strong> {campaign.creator?.contactInfo?.email}
               </Typography>
               <Typography>
-                <strong>Last Modified By:</strong>{" "}
-                {campaign.lastModifiedBy?.contactInfo?.email}
+                <strong>Last Modified By:</strong> {campaign.lastModifiedBy?.contactInfo?.email}
               </Typography>
 
               {/* View Template Button */}
               {campaign.templateId && (
                 <Box sx={{ mt: 2 }}>
-                  <Button
-                    variant="outlined"
-                    onClick={() => setTemplateOpen(true)}
-                  >
+                  <Button variant="outlined" onClick={() => setTemplateOpen(true)}>
                     View Template
                   </Button>
                 </Box>
@@ -152,12 +140,7 @@ export default function ViewCampaignModal({
       </Dialog>
 
       {/* Template Modal */}
-      <Dialog
-        open={templateOpen}
-        onClose={() => setTemplateOpen(false)}
-        fullWidth
-        maxWidth="sm"
-      >
+      <Dialog open={templateOpen} onClose={() => setTemplateOpen(false)} fullWidth maxWidth="sm">
         <DialogTitle>Template Details</DialogTitle>
         <DialogContent dividers>
           {campaign?.templateId ? (
@@ -171,24 +154,23 @@ export default function ViewCampaignModal({
 
               {/* Render template content */}
               <Box sx={{ mt: 2 }}>
-                <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
+                <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
                   {campaign.templateId.template}
                 </Typography>
 
-                {campaign.templateId.type === "text-image" &&
-                  campaign.templateId.campaignImage && (
-                    <Box sx={{ mt: 2, textAlign: "center" }}>
-                      <img
-                        src={campaign.templateId.campaignImage}
-                        alt="Campaign"
-                        style={{
-                          maxWidth: "100%",
-                          height: "auto",
-                          borderRadius: 8,
-                        }}
-                      />
-                    </Box>
-                  )}
+                {campaign.templateId.type === 'text-image' && campaign.templateId.campaignImage && (
+                  <Box sx={{ mt: 2, textAlign: 'center' }}>
+                    <img
+                      src={campaign.templateId.campaignImage}
+                      alt="Campaign"
+                      style={{
+                        maxWidth: '100%',
+                        height: 'auto',
+                        borderRadius: 8,
+                      }}
+                    />
+                  </Box>
+                )}
               </Box>
             </>
           ) : (

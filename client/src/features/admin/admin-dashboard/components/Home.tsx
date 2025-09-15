@@ -1,45 +1,40 @@
-import { Box, Grid, Paper, Typography, useTheme } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
+
+import { Box, Grid, Paper, Typography, useTheme } from '@mui/material';
+
 import {
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-} from "recharts";
-import { analytics } from "../service/analytics.service";
-import type { IWorkspace } from "../types";
-const COLORS = [
-  "#0088FE",
-  "#00C49F",
-  "#FFBB28",
-  "#FF8042",
-  "#AF19FF",
-  "#FF4560",
-];
+} from 'recharts';
+
+import { analytics } from '../service/analytics.service';
+import type { IWorkspace } from '../types';
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF4560'];
 
 export default function Home() {
   const theme = useTheme();
 
   const [stats, setStats] = useState([
-    { title: "Workspaces", value: "0" },
-    { title: "Users", value: "0" },
-    { title: "Campaigns", value: "0" },
-    { title: "Revenue", value: "$12.3k" },
+    { title: 'Workspaces', value: '0' },
+    { title: 'Users', value: '0' },
+    { title: 'Campaigns', value: '0' },
+    { title: 'Revenue', value: '$12.3k' },
   ]);
 
   const [campaignWorkspaceData, setCampaignWorkspaceData] = useState<
     { name: string; value: number }[]
   >([]);
 
-  const [usersPieData, setUsersPieData] = useState<
-    { name: string; value: number }[]
-  >([]);
+  const [usersPieData, setUsersPieData] = useState<{ name: string; value: number }[]>([]);
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -48,10 +43,7 @@ export default function Home() {
 
         const workspacesCount = res.length;
         const usersCount = res.reduce((acc, w) => acc + w.users.length, 0);
-        const campaignsCount = res.reduce(
-          (acc, w) => acc + w.campaigns.length,
-          0
-        );
+        const campaignsCount = res.reduce((acc, w) => acc + w.campaigns.length, 0);
 
         // 🔹 Campaigns by Workspace
         const workspaceData = res.map((w) => ({
@@ -66,16 +58,16 @@ export default function Home() {
         }));
 
         setStats([
-          { title: "Workspaces", value: workspacesCount.toString() },
-          { title: "Users", value: usersCount.toString() },
-          { title: "Campaigns", value: campaignsCount.toString() },
-          { title: "Revenue", value: "$12.3k" },
+          { title: 'Workspaces', value: workspacesCount.toString() },
+          { title: 'Users', value: usersCount.toString() },
+          { title: 'Campaigns', value: campaignsCount.toString() },
+          { title: 'Revenue', value: '$12.3k' },
         ]);
 
         setCampaignWorkspaceData(workspaceData);
         setUsersPieData(pieData);
       } catch (err) {
-        console.log(err);
+        return err;
       }
     };
     fetchAnalytics();
@@ -86,7 +78,7 @@ export default function Home() {
       sx={{
         p: 3,
         backgroundColor: theme.palette.background.default,
-        minHeight: "100vh",
+        minHeight: '100vh',
       }}
     >
       {/* Title */}
@@ -101,10 +93,10 @@ export default function Home() {
             <Paper
               sx={{
                 p: 3,
-                textAlign: "center",
+                textAlign: 'center',
                 borderRadius: 3,
-                background: "linear-gradient(135deg, #6EE7B7 0%, #3B82F6 100%)",
-                color: "#fff",
+                background: 'linear-gradient(135deg, #6EE7B7 0%, #3B82F6 100%)',
+                color: '#fff',
               }}
               elevation={3}
             >
@@ -132,12 +124,8 @@ export default function Home() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis allowDecimals={false} />
-                <Tooltip cursor={{ fill: "transparent" }} />
-                <Bar
-                  dataKey="value"
-                  fill={theme.palette.primary.main}
-                  radius={[5, 5, 0, 0]}
-                />
+                <Tooltip cursor={{ fill: 'transparent' }} />
+                <Bar dataKey="value" fill={theme.palette.primary.main} radius={[5, 5, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </Paper>
@@ -151,14 +139,7 @@ export default function Home() {
             </Typography>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
-                <Pie
-                  data={usersPieData}
-                  dataKey="value"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  label
-                >
+                <Pie data={usersPieData} dataKey="value" cx="50%" cy="50%" outerRadius={100} label>
                   {usersPieData.map((_, index) => (
                     <Cell key={index} fill={COLORS[index % COLORS.length]} />
                   ))}

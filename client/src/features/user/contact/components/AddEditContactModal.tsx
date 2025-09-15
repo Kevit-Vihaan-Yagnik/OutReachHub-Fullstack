@@ -1,17 +1,20 @@
+import { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
-  TextField,
   Chip,
-} from "@mui/material";
-import { Autocomplete } from "@mui/material";
-import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { schema, type IContactFormData, type IContact } from "../types";
-import { useEffect } from "react";
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+} from '@mui/material';
+import { Autocomplete } from '@mui/material';
+
+import { yupResolver } from '@hookform/resolvers/yup';
+
+import { type IContact, type IContactFormData, schema } from '../types';
 
 interface ContactModalProps {
   open: boolean;
@@ -36,13 +39,13 @@ export default function ContactFormModal({
   } = useForm<IContactFormData>({
     resolver: yupResolver(schema),
     defaultValues: {
-      name: "",
-      profilePicture: "",
-      countryCode: "",
+      name: '',
+      profilePicture: '',
+      countryCode: '',
       phoneNo: 0,
-      email: "",
-      company: "",
-      jobTitle: "",
+      email: '',
+      company: '',
+      jobTitle: '',
       tags: [],
     },
   });
@@ -52,23 +55,23 @@ export default function ContactFormModal({
     if (initialData) {
       reset({
         name: initialData.name,
-        profilePicture: initialData.profilePicture || "",
+        profilePicture: initialData.profilePicture || '',
         countryCode: initialData.contactInfo.countryCode,
         phoneNo: initialData.contactInfo.phoneNo,
         email: initialData.contactInfo.email,
-        company: initialData.company || "",
-        jobTitle: initialData.jobTitle || "",
+        company: initialData.company || '',
+        jobTitle: initialData.jobTitle || '',
         tags: initialData.tags || [],
       });
     } else {
       reset({
-        name: "",
-        profilePicture: "",
-        countryCode: "",
+        name: '',
+        profilePicture: '',
+        countryCode: '',
         phoneNo: 0,
-        email: "",
-        company: "",
-        jobTitle: "",
+        email: '',
+        company: '',
+        jobTitle: '',
         tags: [],
       });
     }
@@ -89,9 +92,7 @@ export default function ContactFormModal({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>
-        {initialData ? "Edit Contact" : "Add Contact"}
-      </DialogTitle>
+      <DialogTitle>{initialData ? 'Edit Contact' : 'Add Contact'}</DialogTitle>
       <DialogContent>
         {/* ✅ Name */}
         <Controller
@@ -223,7 +224,8 @@ export default function ContactFormModal({
               }
               renderInput={(params) => (
                 <TextField
-                  {...params as any}
+                  {...(params as { size: string })}
+                  size="medium"
                   label="Tags"
                   placeholder="Select tags"
                   margin="normal"
@@ -241,7 +243,7 @@ export default function ContactFormModal({
           Cancel
         </Button>
         <Button onClick={handleSubmit(handleFormSubmit)} variant="contained">
-          {initialData ? "Save Changes" : "Add"}
+          {initialData ? 'Save Changes' : 'Add'}
         </Button>
       </DialogActions>
     </Dialog>

@@ -1,64 +1,63 @@
 // Contact.tsx
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {
+  Alert,
   Autocomplete,
+  Avatar,
   Box,
   Button,
   Grid,
-  TextField,
-  Typography,
-  useTheme,
+  IconButton,
+  Menu,
+  MenuItem,
   Paper,
+  Snackbar,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
-  TableRow,
   TablePagination,
-  Snackbar,
-  Alert,
-  IconButton,
-  Menu,
-  MenuItem,
-  Avatar,
-} from "@mui/material";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useEffect, useState } from "react";
-import type { RootState } from "@/app/store";
-import { useDispatch, useSelector } from "react-redux";
+  TableRow,
+  TextField,
+  Typography,
+  useTheme,
+} from '@mui/material';
+
+import type { RootState } from '@/app/store';
+
 import {
   addContactToWorkspace,
   deleteContactApi,
   getContactsByWorkspace,
   updateContactApi,
-} from "../service/contact.service";
+} from '../service/contact.service';
 import {
-  setContacts,
-  setLoading,
-  setError,
   addContact,
-  updateContact,
   deleteContact,
-} from "../slices/contactSlice";
-import type { IContact, IContactFormData } from "../types";
-import AddContactModal from "./AddEditContactModal";
-import ViewContactModal from "./ViewContactModal";
-import ContactFormModal from "./AddEditContactModal";
-import DeleteConfirmDialog from "./DeleteContactDialog";
+  setContacts,
+  setError,
+  setLoading,
+  updateContact,
+} from '../slices/contactSlice';
+import type { IContact, IContactFormData } from '../types';
+import AddContactModal from './AddEditContactModal';
+import ContactFormModal from './AddEditContactModal';
+import DeleteConfirmDialog from './DeleteContactDialog';
+import ViewContactModal from './ViewContactModal';
 
 export default function Contact() {
   const theme = useTheme();
   const dispatch = useDispatch();
-  const workspaceId = useSelector(
-    (state: RootState) => state.userAuth.currentWorkspace?.id
-  );
+  const workspaceId = useSelector((state: RootState) => state.userAuth.currentWorkspace?.id);
 
   // 🔹 Elements from Redux
-  const { contacts, loading, error } = useSelector(
-    (state: RootState) => state.contact
-  );
+  const { contacts, loading, error } = useSelector((state: RootState) => state.contact);
   const permission = useSelector(
-    (state: RootState) => state.userAuth.currentWorkspace?.permission.editor
+    (state: RootState) => state.userAuth.currentWorkspace?.permission.editor,
   );
 
   //🔹 Workspace tags from Redux
@@ -66,11 +65,9 @@ export default function Contact() {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [filteredRows, setFilteredRows] = useState<IContact[]>([]);
-  const [selectedContactId, setSelectedContactId] = useState<string | null>(
-    null
-  );
+  const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
   const [selectedContact, setSelectedContact] = useState<IContact | null>(null);
   const [openAdd, setOpenAdd] = useState(false);
   const [openView, setOpenView] = useState(false);
@@ -85,8 +82,8 @@ export default function Contact() {
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
-    severity: "success" | "error";
-  }>({ open: false, message: "", severity: "success" });
+    severity: 'success' | 'error';
+  }>({ open: false, message: '', severity: 'success' });
 
   // 🔹 Fetch contacts from API on mount
   useEffect(() => {
@@ -96,8 +93,8 @@ export default function Contact() {
         dispatch(setLoading(true));
         const res = await getContactsByWorkspace(workspaceId);
         dispatch(setContacts(res));
-      } catch (err: any) {
-        dispatch(setError(err.message || "Failed to fetch contacts"));
+      } catch {
+        dispatch(setError('Failed to fetch contacts'));
       } finally {
         dispatch(setLoading(false));
       }
@@ -110,16 +107,13 @@ export default function Contact() {
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
-  const handleMenuOpen = (
-    event: React.MouseEvent<HTMLElement>,
-    row: IContact
-  ) => {
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, row: IContact) => {
     setAnchorEl(event.currentTarget);
     setMenuRow(row);
   };
@@ -137,15 +131,15 @@ export default function Contact() {
       dispatch(addContact(newContact));
       setSnackbar({
         open: true,
-        message: "Contact added successfully!",
-        severity: "success",
+        message: 'Contact added successfully!',
+        severity: 'success',
       });
     } catch (err) {
-      console.error("❌ Failed to add contact:", err);
+      console.error('❌ Failed to add contact:', err);
       setSnackbar({
         open: true,
-        message: "Contact already exists",
-        severity: "error",
+        message: 'Contact already exists',
+        severity: 'error',
       });
     }
   };
@@ -155,23 +149,20 @@ export default function Contact() {
 
     try {
       if (!workspaceId) return;
-      const updated = await updateContactApi(
-        workspaceId,
-        selectedContact._id,
-        data
-      );
+      const updated = await updateContactApi(workspaceId, selectedContact._id, data);
 
       dispatch(updateContact(updated)); // 👈 you'll need an `updateContactInState` reducer in your slice
       setSnackbar({
         open: true,
-        message: "Contact updated successfully!",
-        severity: "success",
+        message: 'Contact updated successfully!',
+        severity: 'success',
       });
-    } catch (err) {
+    } catch {
+      dispatch(setError('Failed to update Contact'));
       setSnackbar({
         open: true,
-        message: "Failed to update contact",
-        severity: "error",
+        message: 'Failed to update contact',
+        severity: 'error',
       });
     } finally {
       setOpenEdit(false);
@@ -188,13 +179,14 @@ export default function Contact() {
       setSnackbar({
         open: true,
         message,
-        severity: "success",
+        severity: 'success',
       });
-    } catch (err) {
+    } catch {
+      dispatch(setError('Failed to delete contact'));
       setSnackbar({
         open: true,
-        message: "Failed to delete contact",
-        severity: "error",
+        message: 'Failed to delete contact',
+        severity: 'error',
       });
     } finally {
       setOpenDelete(false);
@@ -209,7 +201,7 @@ export default function Contact() {
       sx={{
         p: 3,
         backgroundColor: theme.palette.background.default,
-        minHeight: "100vh",
+        minHeight: '100vh',
       }}
     >
       <Typography variant="h4" fontWeight={700} mb={3} color="primary">
@@ -224,7 +216,9 @@ export default function Contact() {
             options={contacts.map((c) => c.name)}
             value={searchQuery}
             onInputChange={(_, newValue) => setSearchQuery(newValue)}
-            renderInput={(params) => <TextField {...params as any} label="Contact" />}
+            renderInput={(params) => (
+              <TextField {...(params as { size: string })} size="medium" label="Contact" />
+            )}
           />
         </Grid>
         <Grid size={{ xs: 12, md: 4 }} p={1}>
@@ -235,9 +229,7 @@ export default function Contact() {
                 setFilteredRows(contacts);
               } else {
                 setFilteredRows(
-                  contacts.filter((c) =>
-                    c.name.toLowerCase().includes(searchQuery.toLowerCase())
-                  )
+                  contacts.filter((c) => c.name.toLowerCase().includes(searchQuery.toLowerCase())),
                 );
               }
               setPage(0);
@@ -246,26 +238,22 @@ export default function Contact() {
             Search
           </Button>
           {permission ? (
-            <Button
-              variant="contained"
-              sx={{ ml: 2 }}
-              onClick={() => setOpenAdd(true)}
-            >
+            <Button variant="contained" sx={{ ml: 2 }} onClick={() => setOpenAdd(true)}>
               Add +
             </Button>
           ) : (
-            ""
+            ''
           )}
         </Grid>
       </Grid>
 
       {/* Table */}
-      <Paper sx={{ borderRadius: 2, overflow: "hidden", marginTop: "2rem" }}>
+      <Paper sx={{ borderRadius: 2, overflow: 'hidden', marginTop: '2rem' }}>
         <TableContainer>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ display: { xs: "none", md: "table-cell" } }}>
+                <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                   <b>Profile</b>
                 </TableCell>
                 <TableCell>
@@ -274,7 +262,7 @@ export default function Contact() {
                 <TableCell>
                   <b>Email</b>
                 </TableCell>
-                <TableCell sx={{ display: { xs: "none", md: "table-cell" } }}>
+                <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                   <b>Tags</b>
                 </TableCell>
                 <TableCell>
@@ -291,7 +279,7 @@ export default function Contact() {
                 </TableRow>
               ) : error ? (
                 <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ color: "red" }}>
+                  <TableCell colSpan={5} align="center" sx={{ color: 'red' }}>
                     {error}
                   </TableCell>
                 </TableRow>
@@ -300,17 +288,13 @@ export default function Contact() {
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => (
                     <TableRow key={row._id} hover>
-                      <TableCell
-                        sx={{ display: { xs: "none", md: "table-cell" } }}
-                      >
+                      <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                         <Avatar src={row.profilePicture as string} alt={row.name} />
                       </TableCell>
                       <TableCell>{row.name}</TableCell>
                       <TableCell>{row.contactInfo.email}</TableCell>
-                      <TableCell
-                        sx={{ display: { xs: "none", md: "table-cell" } }}
-                      >
-                        {row.tags.join(", ")}
+                      <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                        {row.tags.join(', ')}
                       </TableCell>
                       <TableCell>
                         <IconButton onClick={(e) => handleMenuOpen(e, row)}>
@@ -370,13 +354,13 @@ export default function Contact() {
                 }
                 handleMenuClose();
               }}
-              sx={{ color: "error.main" }}
+              sx={{ color: 'error.main' }}
             >
               Delete
             </MenuItem>
           </div>
         ) : (
-          ""
+          ''
         )}
       </Menu>
 
@@ -417,12 +401,12 @@ export default function Contact() {
         open={snackbar.open}
         autoHideDuration={4000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
         <Alert
           onClose={() => setSnackbar({ ...snackbar, open: false })}
           severity={snackbar.severity}
-          sx={{ width: "100%" }}
+          sx={{ width: '100%' }}
         >
           {snackbar.message}
         </Alert>

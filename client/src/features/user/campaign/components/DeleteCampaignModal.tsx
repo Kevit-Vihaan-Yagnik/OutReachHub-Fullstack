@@ -1,11 +1,11 @@
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Typography,
-} from "@mui/material";
+} from '@mui/material';
 
 interface DeleteCampaignModalProps {
   open: boolean;
@@ -25,9 +25,8 @@ export default function DeleteCampaignModal({
       <DialogTitle>Delete Campaign</DialogTitle>
       <DialogContent>
         <Typography>
-          Are you sure you want to delete{" "}
-          <strong>{campaignName ?? "this campaign"}</strong>? This action cannot
-          be undone.
+          Are you sure you want to delete <strong>{campaignName ?? 'this campaign'}</strong>? This
+          action cannot be undone.
         </Typography>
       </DialogContent>
       <DialogActions>

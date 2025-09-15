@@ -1,7 +1,9 @@
-import { useState, createContext } from 'react';
-import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
-import { Router } from './app/router';
+import { createContext, useState } from 'react';
 import { Provider } from 'react-redux';
+
+import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+
+import { Router } from './app/router';
 import { store } from './app/store';
 
 interface ThemeContextType {
@@ -18,21 +20,20 @@ const App = () => {
       mode,
       ...(mode === 'dark'
         ? {
-          primary: {
-            main: '#90caf9',
-          },
-          background: {
-            default: '#121212',
-            paper: '#1e1e1e',
-          },
-          text: {
-            primary: '#ffffff',
-          },
-        }
+            primary: {
+              main: '#90caf9',
+            },
+            background: {
+              default: '#121212',
+              paper: '#1e1e1e',
+            },
+            text: {
+              primary: '#ffffff',
+            },
+          }
         : {}),
     },
   });
-
 
   return (
     <ThemeContext.Provider value={{ mode }}>

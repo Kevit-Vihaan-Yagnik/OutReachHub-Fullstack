@@ -1,13 +1,14 @@
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Typography,
   Box,
-} from "@mui/material";
-import { type IMessageTemplate } from "../types";
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Typography,
+} from '@mui/material';
+
+import { type IMessageTemplate } from '../types';
 
 interface ViewTemplateModalProps {
   open: boolean;
@@ -15,11 +16,7 @@ interface ViewTemplateModalProps {
   template?: IMessageTemplate | null;
 }
 
-export default function ViewTemplateModal({
-  open,
-  onClose,
-  template,
-}: ViewTemplateModalProps) {
+export default function ViewTemplateModal({ open, onClose, template }: ViewTemplateModalProps) {
   if (!template) return null;
 
   return (
@@ -27,17 +24,17 @@ export default function ViewTemplateModal({
       <DialogTitle>{template.title}</DialogTitle>
       <DialogContent dividers>
         {template.campaignImage && (
-          <Box sx={{ mb: 2, textAlign: "center" }}>
+          <Box sx={{ mb: 2, textAlign: 'center' }}>
             <img
               src={template.campaignImage}
               alt={template.title}
-              style={{ maxWidth: "100%", borderRadius: 8 }}
+              style={{ maxWidth: '100%', borderRadius: 8 }}
             />
           </Box>
         )}
         <Typography
           variant="body1"
-          sx={{ whiteSpace: "pre-line" }} // keeps line breaks
+          sx={{ whiteSpace: 'pre-line' }} // keeps line breaks
         >
           {template.template}
         </Typography>

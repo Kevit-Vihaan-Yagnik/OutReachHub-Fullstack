@@ -1,48 +1,50 @@
+import { useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
 import {
   Box,
+  CircularProgress,
   Grid,
   Paper,
-  Typography,
-  useTheme,
-  CircularProgress,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-} from "@mui/material";
-import { useEffect, useState, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { type RootState } from "@/app/store";
-import { getWorkspaceById } from "@/features/admin/workspace/service/workspace.service";
-import { getCampaignsByWorkspace } from "@/features/user/campaign/service/campaign.service";
-import { getContactsByWorkspace } from "@/features/user/contact/service/contact.service";
-import type { IWorkspace } from "@/features/admin/workspace/types";
-import type { ICampaign } from "@/features/user/campaign/types";
-import type { IContact } from "@/features/user/contact/types";
+  Typography,
+  useTheme,
+} from '@mui/material';
+
 import {
-  PieChart,
-  Pie,
-  Cell,
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
-} from "recharts";
-import { setUserWorkspace } from "../slice/userWorkspaceSlice";
+} from 'recharts';
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#9333EA"];
+import { type RootState } from '@/app/store';
+import { getWorkspaceById } from '@/features/admin/workspace/service/workspace.service';
+import type { IWorkspace } from '@/features/admin/workspace/types';
+import { getCampaignsByWorkspace } from '@/features/user/campaign/service/campaign.service';
+import type { ICampaign } from '@/features/user/campaign/types';
+import { getContactsByWorkspace } from '@/features/user/contact/service/contact.service';
+import type { IContact } from '@/features/user/contact/types';
+
+import { setUserWorkspace } from '../slice/userWorkspaceSlice';
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#9333EA'];
 
 export default function UserDashboard() {
   const theme = useTheme();
   const dispatch = useDispatch();
-  const currentWorkspace = useSelector(
-    (state: RootState) => state.userAuth.currentWorkspace
-  );
+  const currentWorkspace = useSelector((state: RootState) => state.userAuth.currentWorkspace);
 
   const [workspace, setWorkspace] = useState<IWorkspace | null>(null);
   const [campaigns, setCampaigns] = useState<ICampaign[]>([]);
@@ -64,13 +66,13 @@ export default function UserDashboard() {
 
         dispatch(setUserWorkspace(ws));
       } catch (err) {
-        console.error("Error fetching dashboard data", err);
+        console.error('Error fetching dashboard data', err);
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, [currentWorkspace]);
+  }, [currentWorkspace, dispatch]);
 
   // 📊 Campaign status distribution
   const campaignStatusData = useMemo(() => {
@@ -96,10 +98,10 @@ export default function UserDashboard() {
     return (
       <Box
         sx={{
-          minHeight: "80vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          minHeight: '80vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         <CircularProgress />
@@ -112,7 +114,7 @@ export default function UserDashboard() {
       sx={{
         p: 3,
         backgroundColor: theme.palette.background.default,
-        minHeight: "100vh",
+        minHeight: '100vh',
       }}
     >
       {/* Title */}
@@ -123,7 +125,7 @@ export default function UserDashboard() {
       {/* Stats Grid */}
       <Grid container spacing={3} mb={4}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Paper sx={{ p: 3, textAlign: "center", borderRadius: 3 }} elevation={3}>
+          <Paper sx={{ p: 3, textAlign: 'center', borderRadius: 3 }} elevation={3}>
             <Typography variant="h6" fontWeight={600}>
               Users
             </Typography>
@@ -133,7 +135,7 @@ export default function UserDashboard() {
           </Paper>
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Paper sx={{ p: 3, textAlign: "center", borderRadius: 3 }} elevation={3}>
+          <Paper sx={{ p: 3, textAlign: 'center', borderRadius: 3 }} elevation={3}>
             <Typography variant="h6" fontWeight={600}>
               Campaigns
             </Typography>
@@ -143,7 +145,7 @@ export default function UserDashboard() {
           </Paper>
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Paper sx={{ p: 3, textAlign: "center", borderRadius: 3 }} elevation={3}>
+          <Paper sx={{ p: 3, textAlign: 'center', borderRadius: 3 }} elevation={3}>
             <Typography variant="h6" fontWeight={600}>
               Contacts
             </Typography>
@@ -153,7 +155,7 @@ export default function UserDashboard() {
           </Paper>
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Paper sx={{ p: 3, textAlign: "center", borderRadius: 3 }} elevation={3}>
+          <Paper sx={{ p: 3, textAlign: 'center', borderRadius: 3 }} elevation={3}>
             <Typography variant="h6" fontWeight={600}>
               Tags
             </Typography>
@@ -203,7 +205,7 @@ export default function UserDashboard() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis allowDecimals={false} />
-                <Tooltip cursor = {{fill : 'transparent'}}/>
+                <Tooltip cursor={{ fill: 'transparent' }} />
                 <Bar dataKey="value" fill={theme.palette.primary.main} radius={[5, 5, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -229,15 +231,15 @@ export default function UserDashboard() {
             </TableHead>
             <TableBody>
               {campaigns.length > 0 ? (
-                campaigns.slice(0,5).map((c) => (
+                campaigns.slice(0, 5).map((c) => (
                   <TableRow key={c._id}>
                     <TableCell>{c.name}</TableCell>
                     <TableCell>{c.status}</TableCell>
                     <TableCell>
-                      {c.startDate ? new Date(c.startDate).toLocaleDateString() : "—"}
+                      {c.startDate ? new Date(c.startDate).toLocaleDateString() : '—'}
                     </TableCell>
                     <TableCell>
-                      {c.endDate ? new Date(c.endDate).toLocaleDateString() : "—"}
+                      {c.endDate ? new Date(c.endDate).toLocaleDateString() : '—'}
                     </TableCell>
                     <TableCell align="right">{c.audienceSize ?? 0}</TableCell>
                   </TableRow>

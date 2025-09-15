@@ -15,9 +15,5 @@
   "importOrderGroupNamespaceSpecifiers": true,
   "importOrderSeparation": true,
   "importOrderSortSpecifiers": true,
-  "plugins": ["@trivago/prettier-plugin-sort-imports"],
-  "prettier:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
-    "prettier:fix": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
-    "lint:check": "eslint --ext .js,.jsx,.ts,.tsx,.json src --max-warnings=0 --no-warn-ignored",
-    "ts:check": "tsc --noEmit"
+  "plugins": ["@trivago/prettier-plugin-sort-imports"]
 }

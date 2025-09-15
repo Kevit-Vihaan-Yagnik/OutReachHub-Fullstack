@@ -1,12 +1,13 @@
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Typography,
-} from "@mui/material";
-import { type IMessageTemplate } from "../types";
+} from '@mui/material';
+
+import { type IMessageTemplate } from '../types';
 
 interface DeleteTemplateModalProps {
   open: boolean;
@@ -28,19 +29,14 @@ export default function DeleteTemplateModal({
       <DialogTitle>Delete Template</DialogTitle>
       <DialogContent>
         <Typography>
-          Are you sure you want to delete{" "}
-          <strong>{template.title}</strong>?
+          Are you sure you want to delete <strong>{template.title}</strong>?
         </Typography>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="secondary">
           Cancel
         </Button>
-        <Button
-          onClick={() => onConfirm(template._id)}
-          color="error"
-          variant="contained"
-        >
+        <Button onClick={() => onConfirm(template._id)} color="error" variant="contained">
           Delete
         </Button>
       </DialogActions>

@@ -1,20 +1,23 @@
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
   Avatar,
-  Typography,
-  Chip,
   Box,
+  Button,
+  Chip,
   CircularProgress,
-} from "@mui/material";
-import { useEffect, useState } from "react";
-import type { IContact } from "../types";
-import { getContactById } from "../service/contact.service";
-import { useSelector } from "react-redux";
-import type { RootState } from "@/app/store";
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Typography,
+} from '@mui/material';
+
+import type { RootState } from '@/app/store';
+
+import { getContactById } from '../service/contact.service';
+import type { IContact } from '../types';
 
 interface ViewContactModalProps {
   open: boolean;
@@ -22,16 +25,10 @@ interface ViewContactModalProps {
   contactId: string | null;
 }
 
-export default function ViewContactModal({
-  open,
-  onClose,
-  contactId,
-}: ViewContactModalProps) {
+export default function ViewContactModal({ open, onClose, contactId }: ViewContactModalProps) {
   const [contact, setContact] = useState<IContact | null>(null);
   const [loading, setLoading] = useState(false);
-  const workspaceId = useSelector(
-    (state: RootState) => state.userAuth.currentWorkspace?.id
-  );
+  const workspaceId = useSelector((state: RootState) => state.userAuth.currentWorkspace?.id);
   useEffect(() => {
     if (!contactId || !open || !workspaceId) return;
 
@@ -41,14 +38,14 @@ export default function ViewContactModal({
         const res = await getContactById(workspaceId, contactId);
         setContact(res);
       } catch (err) {
-        console.error("❌ Failed to fetch contact:", err);
+        console.error('❌ Failed to fetch contact:', err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchContact();
-  }, [contactId, open]);
+  }, [contactId, open, workspaceId]);
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
@@ -59,12 +56,7 @@ export default function ViewContactModal({
             <CircularProgress />
           </Box>
         ) : contact ? (
-          <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            gap={2}
-          >
+          <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
             {/* Profile picture */}
             <Avatar
               src={contact.profilePicture as string}

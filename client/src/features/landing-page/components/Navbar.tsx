@@ -1,12 +1,6 @@
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Box,
-  Button,
-  useTheme,
-} from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
+
+import { AppBar, Box, Button, Toolbar, Typography, useTheme } from '@mui/material';
 
 const Navbar = () => {
   const theme = useTheme();
@@ -15,15 +9,15 @@ const Navbar = () => {
   const handleScroll = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
   const navItems = [
-    { label: "Home", id: "home" },
-    { label: "Features", id: "features" },
-    { label: "Pricing", id: "pricing" },
-    { label: "FAQs", id: "faqs" },
+    { label: 'Home', id: 'home' },
+    { label: 'Features', id: 'features' },
+    { label: 'Pricing', id: 'pricing' },
+    { label: 'FAQs', id: 'faqs' },
   ];
 
   return (
@@ -31,26 +25,24 @@ const Navbar = () => {
       position="sticky"
       sx={{
         zIndex: (theme) => theme.zIndex.drawer + 1,
-        backdropFilter: "blur(10px)",
+        backdropFilter: 'blur(10px)',
         background: `linear-gradient(135deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.1))`,
-        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
         borderBottom: `1px solid ${theme.palette.divider}`,
       }}
     >
-      <Toolbar
-        sx={{ justifyContent: "space-between", padding: { xs: 1, md: 2 } }}
-      >
-        <Box sx={{ display: "flex", alignItems: "center" }}>
+      <Toolbar sx={{ justifyContent: 'space-between', padding: { xs: 1, md: 2 } }}>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Typography
             variant="h6"
             component="div"
             sx={{
               fontWeight: 600,
-              background: "linear-gradient(90deg, #00ffcc, #b300ff)",
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-              color: "transparent",
-              "-webkit-text-fill-color": "transparent",
+              background: 'linear-gradient(90deg, #00ffcc, #b300ff)',
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              color: 'transparent',
+              '-webkit-text-fill-color': 'transparent',
               mr: 2,
             }}
           >
@@ -59,10 +51,10 @@ const Navbar = () => {
         </Box>
         <Box
           sx={{
-            display: { xs: "none", md: "flex" },
-            justifyContent: "center",
+            display: { xs: 'none', md: 'flex' },
+            justifyContent: 'center',
             flexGrow: 1,
-            alignItems: "center",
+            alignItems: 'center',
           }}
         >
           {navItems.map((item) => (
@@ -73,9 +65,9 @@ const Navbar = () => {
                 mx: 2,
                 fontWeight: 500,
                 color: theme.palette.text.primary,
-                "&:hover": {
+                '&:hover': {
                   color: theme.palette.primary.main,
-                  backgroundColor: "transparent",
+                  backgroundColor: 'transparent',
                 },
               }}
               onClick={() => handleScroll(item.id)}
@@ -84,17 +76,17 @@ const Navbar = () => {
             </Button>
           ))}
         </Box>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Button
             color="inherit"
             variant="outlined"
             sx={{
               mx: 1,
               borderRadius: 20,
-              textTransform: "none",
-              "&:hover": { borderColor: theme.palette.primary.main },
+              textTransform: 'none',
+              '&:hover': { borderColor: theme.palette.primary.main },
             }}
-            onClick={() => navigate("/user/login")}
+            onClick={() => navigate('/user/login')}
           >
             Get Started
           </Button>

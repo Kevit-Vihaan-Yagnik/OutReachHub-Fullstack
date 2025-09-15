@@ -1,168 +1,185 @@
-import { Box, Typography, TextField, Button, useTheme, Alert, Snackbar } from '@mui/material';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { schema, type LoginFormData } from '../types';
-import { adminLogin } from '../service/auth.service';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { login } from '../slices/adminAuthSlice';
 import { useNavigate } from 'react-router-dom';
 
+import { Alert, Box, Button, Snackbar, TextField, Typography, useTheme } from '@mui/material';
+
+import { yupResolver } from '@hookform/resolvers/yup';
+
+import { adminLogin } from '../service/auth.service';
+import { login } from '../slices/adminAuthSlice';
+import { type LoginFormData, schema } from '../types';
+
 const AdminLogin = () => {
-    const theme = useTheme();
-    const [openSnackbar, setOpenSnackbar] = useState(false);
-    const [errorSnackbar, setErrorSnackbar] = useState(false);
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+  const theme = useTheme();
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [errorSnackbar, setErrorSnackbar] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        reset
-    } = useForm<LoginFormData>({
-        resolver: yupResolver(schema),
-        defaultValues: {
-            email: '',
-            password: '',
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<LoginFormData>({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+    mode: 'onChange',
+  });
+
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      const res = await adminLogin(data);
+      dispatch(
+        login({
+          id: res.id,
+          email: res.email,
+          access_token: res.access_token,
+          refresh_token: res.refresh_token,
+        }),
+      );
+      setOpenSnackbar(true);
+      navigate('/admin/dashboard');
+    } catch (error) {
+      console.error('Login failed:', error);
+      setErrorSnackbar(true);
+      reset();
+    }
+  };
+
+  return (
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        background: 'linear-gradient(135deg, #1e1e1e, #121212)',
+        position: 'relative',
+        overflow: 'hidden',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.3))',
+          backdropFilter: 'blur(5px)',
+          zIndex: 0,
         },
-        mode: 'onChange',
-    });
-
-    const onSubmit = async (data: LoginFormData) => {
-        try {
-            const res = await adminLogin(data);
-            dispatch(
-                login({
-                    id: res.id,
-                    email: res.email,
-                    access_token: res.access_token,
-                    refresh_token: res.refresh_token,
-                })
-            );
-            setOpenSnackbar(true);
-            navigate('/admin/dashboard')
-        } catch (error) {
-            console.error('Login failed:', error);
-            setErrorSnackbar(true)
-            reset()
-        }
-    };
-
-    return (
-        <Box
-            sx={{
-                minHeight: '100vh',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                background: 'linear-gradient(135deg, #1e1e1e, #121212)',
-                position: 'relative',
-                overflow: 'hidden',
-                '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.3))',
-                    backdropFilter: 'blur(5px)',
-                    zIndex: 0,
-                },
-            }}
+      }}
+    >
+      <Box
+        component="form"
+        onSubmit={handleSubmit(onSubmit)}
+        sx={{
+          position: 'relative',
+          zIndex: 1,
+          p: { xs: 3, md: 4 },
+          background: 'rgba(255, 255, 255, 0.05)',
+          backdropFilter: 'blur(10px)',
+          borderRadius: 2,
+          width: { xs: '90%', md: '400px' },
+          textAlign: 'center',
+        }}
+      >
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: 700,
+            background: 'linear-gradient(90deg, #00ffcc, #b300ff)',
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            color: 'transparent',
+            '-webkit-text-fill-color': 'transparent',
+            mb: 3,
+          }}
         >
-            <Box
-                component="form"
-                onSubmit={handleSubmit(onSubmit)}
-                sx={{
-                    position: 'relative',
-                    zIndex: 1,
-                    p: { xs: 3, md: 4 },
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    backdropFilter: 'blur(10px)',
-                    borderRadius: 2,
-                    width: { xs: '90%', md: '400px' },
-                    textAlign: 'center',
-                }}
-            >
-                <Typography
-                    variant="h5"
-                    sx={{
-                        fontWeight: 700,
-                        background: 'linear-gradient(90deg, #00ffcc, #b300ff)',
-                        WebkitBackgroundClip: 'text',
-                        backgroundClip: 'text',
-                        color: 'transparent',
-                        '-webkit-text-fill-color': 'transparent',
-                        mb: 3,
-                    }}
-                >
-                    Admin Login
-                </Typography>
+          Admin Login
+        </Typography>
 
-                {errors.email && <Alert severity="error" sx={{ mb: 2 }}>{errors.email.message}</Alert>}
-                {errors.password && <Alert severity="error" sx={{ mb: 2 }}>{errors.password.message}</Alert>}
+        {errors.email && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {errors.email.message}
+          </Alert>
+        )}
+        {errors.password && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {errors.password.message}
+          </Alert>
+        )}
 
-                <TextField
-                    fullWidth
-                    label="Email"
-                    variant="outlined"
-                    type="email"
-                    {...register('email')}
-                    error={!!errors.email}
-                    helperText={errors.email ? errors.email.message : ''}
-                    sx={{ mb: 2, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: theme.palette.divider } } }}
-                />
-                <TextField
-                    fullWidth
-                    label="Password"
-                    variant="outlined"
-                    type="password"
-                    {...register('password')}
-                    error={!!errors.password}
-                    helperText={errors.password ? errors.password.message : ''}
-                    sx={{ mb: 3, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: theme.palette.divider } } }}
-                />
+        <TextField
+          fullWidth
+          label="Email"
+          variant="outlined"
+          type="email"
+          {...register('email')}
+          error={!!errors.email}
+          helperText={errors.email ? errors.email.message : ''}
+          sx={{
+            mb: 2,
+            '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: theme.palette.divider } },
+          }}
+        />
+        <TextField
+          fullWidth
+          label="Password"
+          variant="outlined"
+          type="password"
+          {...register('password')}
+          error={!!errors.password}
+          helperText={errors.password ? errors.password.message : ''}
+          sx={{
+            mb: 3,
+            '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: theme.palette.divider } },
+          }}
+        />
 
-                <Button
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                    size="large"
-                    sx={{
-                        width: '100%',
-                        borderRadius: 20,
-                        textTransform: 'none',
-                        '&:hover': { backgroundColor: theme.palette.primary.dark },
-                    }}
-                >
-                    Login
-                </Button>
-            </Box>
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          size="large"
+          sx={{
+            width: '100%',
+            borderRadius: 20,
+            textTransform: 'none',
+            '&:hover': { backgroundColor: theme.palette.primary.dark },
+          }}
+        >
+          Login
+        </Button>
+      </Box>
 
-            <Snackbar
-                open={openSnackbar}
-                autoHideDuration={3000}
-                onClose={() => setOpenSnackbar(false)}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            >
-                <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: '100%' }}>
-                    Login successful 🎉
-                </Alert>
-            </Snackbar>
-            <Snackbar
-                open={errorSnackbar}
-                autoHideDuration={3000}
-                onClose={() => setErrorSnackbar(false)}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            >
-                <Alert onClose={() => setErrorSnackbar(false)} severity="error" sx={{ width: '100%' }}>
-                    Login Failed
-                </Alert>
-            </Snackbar>
-        </Box>
-    );
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: '100%' }}>
+          Login successful 🎉
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={errorSnackbar}
+        autoHideDuration={3000}
+        onClose={() => setErrorSnackbar(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setErrorSnackbar(false)} severity="error" sx={{ width: '100%' }}>
+          Login Failed
+        </Alert>
+      </Snackbar>
+    </Box>
+  );
 };
 
 export default AdminLogin;

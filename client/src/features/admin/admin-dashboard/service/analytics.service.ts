@@ -1,6 +1,7 @@
-import { get } from "@/utils/api.util"
-import type { IWorkspace } from "../types";
+import { get } from '@/utils/api.util';
 
-export const analytics = async() : Promise<IWorkspace[]> => {
-    return await get('/workspace');
-}
+import type { IWorkspace } from '../types';
+
+export const analytics = async (): Promise<IWorkspace[]> => {
+  return await get('/workspace');
+};

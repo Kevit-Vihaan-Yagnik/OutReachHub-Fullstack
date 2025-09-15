@@ -1,4 +1,4 @@
-import { Box, Typography, Link, useTheme } from '@mui/material';
+import { Box, Link, Typography, useTheme } from '@mui/material';
 
 const Footer = () => {
   const theme = useTheme();
@@ -58,24 +58,46 @@ const Footer = () => {
           </Box>
           <Box sx={{ display: 'flex', gap: 4 }}>
             <Box>
-              <Typography variant="subtitle1" sx={{ color: theme.palette.text.primary, mb: 1, fontWeight: 500 }}>
+              <Typography
+                variant="subtitle1"
+                sx={{ color: theme.palette.text.primary, mb: 1, fontWeight: 500 }}
+              >
                 Company
               </Typography>
-              <Link href="#" underline="hover" sx={{ display: 'block', color: theme.palette.text.secondary, mb: 1 }}>
+              <Link
+                href="#"
+                underline="hover"
+                sx={{ display: 'block', color: theme.palette.text.secondary, mb: 1 }}
+              >
                 About Us
               </Link>
-              <Link href="#" underline="hover" sx={{ display: 'block', color: theme.palette.text.secondary }}>
+              <Link
+                href="#"
+                underline="hover"
+                sx={{ display: 'block', color: theme.palette.text.secondary }}
+              >
                 Blog
               </Link>
             </Box>
             <Box>
-              <Typography variant="subtitle1" sx={{ color: theme.palette.text.primary, mb: 1, fontWeight: 500 }}>
+              <Typography
+                variant="subtitle1"
+                sx={{ color: theme.palette.text.primary, mb: 1, fontWeight: 500 }}
+              >
                 Support
               </Typography>
-              <Link href="#" underline="hover" sx={{ display: 'block', color: theme.palette.text.secondary, mb: 1 }}>
+              <Link
+                href="#"
+                underline="hover"
+                sx={{ display: 'block', color: theme.palette.text.secondary, mb: 1 }}
+              >
                 Help Center
               </Link>
-              <Link href="#" underline="hover" sx={{ display: 'block', color: theme.palette.text.secondary }}>
+              <Link
+                href="#"
+                underline="hover"
+                sx={{ display: 'block', color: theme.palette.text.secondary }}
+              >
                 Contact Us
               </Link>
             </Box>
@@ -83,7 +105,12 @@ const Footer = () => {
         </Box>
         <Typography
           variant="body2"
-          sx={{ color: theme.palette.text.secondary, textAlign: 'center', borderTop: `1px solid ${theme.palette.divider}`, pt: 2 }}
+          sx={{
+            color: theme.palette.text.secondary,
+            textAlign: 'center',
+            borderTop: `1px solid ${theme.palette.divider}`,
+            pt: 2,
+          }}
         >
           © {new Date().getFullYear()} OutReachHub. All rights reserved.
         </Typography>

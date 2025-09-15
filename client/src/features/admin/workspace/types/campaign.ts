@@ -6,7 +6,7 @@ export interface ICampaign {
   lastModifiedBy: string;
   name: string;
   tags: string[];
-  status: "Draft" | "Running" | "Completed" | "Paused" | string; // flexible enum
+  status: 'Draft' | 'Running' | 'Completed' | 'Paused' | string; // flexible enum
   startDate: string;
   endDate: string;
   audienceSize: number;

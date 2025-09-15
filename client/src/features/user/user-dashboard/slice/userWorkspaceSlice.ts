@@ -1,9 +1,7 @@
 // features/workspace/slices/workspaceUserSlice.ts
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import {
-  type IWorkspace,
-  type IWorkspaceUser,
-} from "@/features/admin/workspace/types";
+import { type PayloadAction, createSlice } from '@reduxjs/toolkit';
+
+import { type IWorkspace, type IWorkspaceUser } from '@/features/admin/workspace/types';
 
 export interface WorkspaceUserState {
   current: IWorkspace | null;
@@ -13,7 +11,7 @@ export interface WorkspaceUserState {
   error: string | null;
 }
 
-const persisted = localStorage.getItem("userWorkspace");
+const persisted = localStorage.getItem('userWorkspace');
 
 const initialState: WorkspaceUserState = persisted
   ? { ...JSON.parse(persisted), loading: false, error: null }
@@ -26,7 +24,7 @@ const initialState: WorkspaceUserState = persisted
     };
 
 const workspaceUserSlice = createSlice({
-  name: "workspaceUser",
+  name: 'workspaceUser',
   initialState,
   reducers: {
     setUserWorkspace: (state, action: PayloadAction<IWorkspace>) => {
@@ -39,8 +37,8 @@ const workspaceUserSlice = createSlice({
       state.users =
         action.payload.users
           ?.map((u) => {
-            if (typeof u === "string") {
-              return { id: u, name: "Unknown User" }; // fallback for IDs
+            if (typeof u === 'string') {
+              return { id: u, name: 'Unknown User' }; // fallback for IDs
             }
             const userObj = u as IWorkspaceUser;
             return { id: userObj._id, name: userObj.name };
@@ -49,12 +47,12 @@ const workspaceUserSlice = createSlice({
 
       // ✅ Persist to localStorage
       localStorage.setItem(
-        "userWorkspace",
+        'userWorkspace',
         JSON.stringify({
           current: state.current,
           tags: state.tags,
           users: state.users,
-        })
+        }),
       );
     },
     clearUserWorkspace: (state) => {
@@ -64,7 +62,7 @@ const workspaceUserSlice = createSlice({
       state.loading = false;
       state.error = null;
 
-      localStorage.removeItem("userWorkspace");
+      localStorage.removeItem('userWorkspace');
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;

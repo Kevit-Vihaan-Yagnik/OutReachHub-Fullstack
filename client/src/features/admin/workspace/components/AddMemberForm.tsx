@@ -1,33 +1,34 @@
+import { Controller, useForm } from 'react-hook-form';
+
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
   Box,
+  Button,
+  Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControlLabel,
+  FormGroup,
   Grid,
-} from "@mui/material";
-import { useForm, Controller } from "react-hook-form";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as XLSX from "xlsx";
+  TextField,
+} from '@mui/material';
+
+import * as XLSX from 'xlsx';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+
+import { downloadSampleExcel } from '@/utils/excel.util';
+
 import {
   type IAddMemberModalProps,
   type IAddMembersDto,
+  IExcelRow,
   type IMemberToAdd,
   schema,
-} from "../types";
-import { downloadSampleExcel } from "@/utils/excel.util";
+} from '../types';
 
-export default function AddMemberModal({
-  open,
-  onClose,
-  onSubmit,
-}: IAddMemberModalProps) {
+export default function AddMemberModal({ open, onClose, onSubmit }: IAddMemberModalProps) {
   type FormSchema = yup.InferType<typeof schema>;
 
   const {
@@ -38,12 +39,12 @@ export default function AddMemberModal({
   } = useForm<FormSchema>({
     resolver: yupResolver(schema),
     defaultValues: {
-      name: "",
-      avatarUrl: "",
+      name: '',
+      avatarUrl: '',
       contactInfo: {
-        countryCode: "+91",
+        countryCode: '+91',
         phoneNo: undefined as unknown as number,
-        email: "",
+        email: '',
       },
       permissions: { editor: false, viewer: true, allowAdd: false },
     },
@@ -56,34 +57,32 @@ export default function AddMemberModal({
     onClose();
   };
 
-  const handleFileUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     try {
       const data = await file.arrayBuffer();
-      const workbook = XLSX.read(data, { type: "array" });
+      const workbook = XLSX.read(data, { type: 'array' });
       const firstSheetName = workbook.SheetNames[0];
       if (!firstSheetName) {
         return;
       }
       const sheet = workbook.Sheets[firstSheetName];
-      const rows: any[] = XLSX.utils.sheet_to_json(sheet!);
+      const rows: IExcelRow[] = XLSX.utils.sheet_to_json(sheet!);
 
       const members: IMemberToAdd[] = rows.map((row) => ({
-        name: row["Name"],
-        avatarUrl: row["AvatarUrl"] || null,
+        name: row['Name'],
+        avatarUrl: row['AvatarUrl'] || null,
         contactInfo: {
-          countryCode: row["CountryCode"] || "+91",
-          phoneNo: Number(row["PhoneNo"]),
-          email: row["Email"],
+          countryCode: row['CountryCode'] || '+91',
+          phoneNo: Number(row['PhoneNo']),
+          email: row['Email'],
         },
         permissions: {
-          viewer: row["Viewer"]?.toString().toLowerCase() === "true",
-          editor: row["Editor"]?.toString().toLowerCase() === "true",
-          allowAdd: row["AllowAdd"]?.toString().toLowerCase() === "true",
+          viewer: row['Viewer']?.toString().toLowerCase() === 'true',
+          editor: row['Editor']?.toString().toLowerCase() === 'true',
+          allowAdd: row['AllowAdd']?.toString().toLowerCase() === 'true',
         },
       }));
 
@@ -92,24 +91,24 @@ export default function AddMemberModal({
 
       onClose();
     } catch (err) {
-      console.error("❌ Failed to parse Excel:", err);
+      return err;
     }
   };
 
   const handleDemoDownload = () => {
     const sampleData = [
       {
-        Name: "John Doe",
-        CountryCode: "+91",
-        PhoneNo: "9876543210",
-        Email: "john@example.com",
-        AvatarUrl: "",
-        Viewer: "TRUE",
-        Editor: "FALSE",
-        AllowAdd: "FALSE",
+        Name: 'John Doe',
+        CountryCode: '+91',
+        PhoneNo: '9876543210',
+        Email: 'john@example.com',
+        AvatarUrl: '',
+        Viewer: 'TRUE',
+        Editor: 'FALSE',
+        AllowAdd: 'FALSE',
       },
     ];
-    downloadSampleExcel("members", "sample_members", sampleData);
+    downloadSampleExcel('members', 'sample_members', sampleData);
   };
 
   return (
@@ -142,7 +141,7 @@ export default function AddMemberModal({
               margin="normal"
               error={!!errors.avatarUrl}
               helperText={errors.avatarUrl?.message}
-              value={field.value || ""}
+              value={field.value || ''}
             />
           )}
         />
@@ -158,7 +157,7 @@ export default function AddMemberModal({
               margin="normal"
               error={!!errors.contactInfo?.countryCode}
               helperText={errors.contactInfo?.countryCode?.message}
-              value={field.value || ""}
+              value={field.value || ''}
             />
           )}
         />
@@ -175,7 +174,7 @@ export default function AddMemberModal({
               margin="normal"
               error={!!errors.contactInfo?.phoneNo}
               helperText={errors.contactInfo?.phoneNo?.message}
-              value={field.value || ""}
+              value={field.value || ''}
             />
           )}
         />
@@ -234,7 +233,7 @@ export default function AddMemberModal({
           <input
             type="file"
             accept=".xlsx, .xls"
-            style={{ display: "none" }}
+            style={{ display: 'none' }}
             id="excel-upload"
             onChange={handleFileUpload}
           />
@@ -260,11 +259,7 @@ export default function AddMemberModal({
         <Button onClick={onClose} color="secondary">
           Cancel
         </Button>
-        <Button
-          onClick={handleSubmit(handleFormSubmit)}
-          variant="contained"
-          color="primary"
-        >
+        <Button onClick={handleSubmit(handleFormSubmit)} variant="contained" color="primary">
           Save
         </Button>
       </DialogActions>

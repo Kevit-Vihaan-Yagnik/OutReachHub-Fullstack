@@ -1,11 +1,11 @@
 import {
+  Button,
   Dialog,
-  DialogTitle,
+  DialogActions,
   DialogContent,
   DialogContentText,
-  DialogActions,
-  Button,
-} from "@mui/material";
+  DialogTitle,
+} from '@mui/material';
 
 interface DeleteConfirmDialogProps {
   open: boolean;
@@ -25,8 +25,8 @@ export default function DeleteConfirmDialog({
       <DialogTitle>Delete Contact</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Are you sure you want to delete{" "}
-          <strong>{contactName}</strong>? This action cannot be undone.
+          Are you sure you want to delete <strong>{contactName}</strong>? This action cannot be
+          undone.
         </DialogContentText>
       </DialogContent>
       <DialogActions>

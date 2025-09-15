@@ -29,8 +29,8 @@ export interface IUserWorkspaceLink {
 
 // what we store in Redux when a workspace is chosen
 export interface ICurrentWorkspace {
-  id: string;            
-  name: string;          
+  id: string;
+  name: string;
   permission: {
     editor: boolean;
     viewer: boolean;

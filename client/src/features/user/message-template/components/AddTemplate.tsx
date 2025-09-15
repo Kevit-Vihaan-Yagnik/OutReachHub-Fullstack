@@ -1,16 +1,19 @@
+import { Controller, useForm } from 'react-hook-form';
+
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
-} from "@mui/material";
-import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { schema, type ITemplateFormData } from "../types";
+} from '@mui/material';
+
+import { yupResolver } from '@hookform/resolvers/yup';
+
+import { type ITemplateFormData, schema } from '../types';
 
 interface AddTemplateModalProps {
   open: boolean;
@@ -18,11 +21,7 @@ interface AddTemplateModalProps {
   onSubmit: (data: ITemplateFormData) => void;
 }
 
-export default function AddTemplateModal({
-  open,
-  onClose,
-  onSubmit,
-}: AddTemplateModalProps) {
+export default function AddTemplateModal({ open, onClose, onSubmit }: AddTemplateModalProps) {
   const {
     control,
     handleSubmit,
@@ -32,22 +31,36 @@ export default function AddTemplateModal({
   } = useForm<ITemplateFormData>({
     resolver: yupResolver(schema),
     defaultValues: {
-      title: "",
-      type: "text",
-      template: "",
-      campaignImage: "",
+      title: '',
+      type: 'text',
+      template: '',
+      campaignImage: '',
     },
   });
 
-  const type = watch("type");
+  const type = watch('type');
+
+  type CleanedData = {
+    title: string;
+    type: 'text' | 'text-image';
+    template: string;
+  };
 
   const handleFormSubmit = (data: ITemplateFormData) => {
-    const cleanedData =
-      data.type === "text"
-        ? (({ campaignImage, ...rest }) => rest)(data)
-        : data;
+    let dataForSubmission: CleanedData | ITemplateFormData;
 
-    onSubmit(cleanedData as ITemplateFormData);
+    if (data.type === 'text') {
+      const cleanedData: CleanedData = {
+        title: data.title,
+        type: data.type,
+        template: data.template,
+      };
+      dataForSubmission = cleanedData;
+    } else {
+      dataForSubmission = data;
+    }
+
+    onSubmit(dataForSubmission);
     reset();
     onClose();
   };
@@ -109,7 +122,7 @@ export default function AddTemplateModal({
         />
 
         {/* Campaign Image (only for text-image) */}
-        {type === "text-image" && (
+        {type === 'text-image' && (
           <Controller
             name="campaignImage"
             control={control}
@@ -131,11 +144,7 @@ export default function AddTemplateModal({
         <Button onClick={onClose} color="secondary">
           Cancel
         </Button>
-        <Button
-          onClick={handleSubmit(handleFormSubmit)}
-          variant="contained"
-          color="primary"
-        >
+        <Button onClick={handleSubmit(handleFormSubmit)} variant="contained" color="primary">
           Add Template
         </Button>
       </DialogActions>
