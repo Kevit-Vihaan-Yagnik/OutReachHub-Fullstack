@@ -31,4 +31,4 @@ export const schema: yup.ObjectSchema<ITemplateFormData> = yup.object().shape({
       then: (schema) => schema.required("Image URL is required"),
       otherwise: (schema) => schema.optional().nullable(),
     }),
-});
+}) as yup.ObjectSchema<ITemplateFormData>;

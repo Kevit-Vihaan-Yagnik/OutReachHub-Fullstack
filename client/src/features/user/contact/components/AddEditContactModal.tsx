@@ -223,7 +223,7 @@ export default function ContactFormModal({
               }
               renderInput={(params) => (
                 <TextField
-                  {...params}
+                  {...params as any}
                   label="Tags"
                   placeholder="Select tags"
                   margin="normal"

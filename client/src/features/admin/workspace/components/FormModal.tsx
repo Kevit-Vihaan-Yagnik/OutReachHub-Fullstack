@@ -94,9 +94,16 @@ export default function FormModal({ open, onClose, onSubmit }: FormModalProps) {
                   />
                 ))
               }
-              renderInput={(params) => (
-                <TextField {...params} label="Tags" placeholder="Select tags" />
-              )}
+              renderInput={(params) => {
+                return (
+                  <TextField
+                    {...params as any}
+                    size='small'
+                    label="Tags"
+                    placeholder="Select tags"
+                  />
+                );
+              }}
             />
           )}
         />

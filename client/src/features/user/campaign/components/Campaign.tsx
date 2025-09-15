@@ -466,14 +466,14 @@ export default function CampaignTable() {
             setOpenView(false);
             setSelectedCampaign(null);
           }}
-          campaignId={selectedCampaign?._id}
+          campaignId={selectedCampaign?._id || ''}
         />
 
         <DeleteCampaignModal
           open={openDelete}
           onClose={() => setOpenDelete(false)}
           onConfirm={handleDeleteCampaign}
-          campaignName={deletingCampaign?.name}
+          campaignName={deletingCampaign?.name || ''}
         />
 
         {/* Snackbar */}

@@ -54,12 +54,12 @@ export default function WorkspacePicker() {
         if (!loading && activeWorkspaces.length === 1) {
             const w = activeWorkspaces[0];
             const payload: ICurrentWorkspace = {
-                id: w.workspaceId._id,
-                name: w.workspaceId.name,
+                id: w!.workspaceId._id,
+                name: w!.workspaceId.name,
                 permission: {
-                    editor: !!w.permission?.editor,
-                    viewer: !!w.permission?.viewer,
-                    allowAdd: !!w.permission?.allowAdd,
+                    editor: !!w!.permission?.editor,
+                    viewer: !!w!.permission?.viewer,
+                    allowAdd: !!w!.permission?.allowAdd,
                 },
             };
             dispatch(setCurrentWorkspace(payload));

@@ -224,7 +224,7 @@ export default function Contact() {
             options={contacts.map((c) => c.name)}
             value={searchQuery}
             onInputChange={(_, newValue) => setSearchQuery(newValue)}
-            renderInput={(params) => <TextField {...params} label="Contact" />}
+            renderInput={(params) => <TextField {...params as any} label="Contact" />}
           />
         </Grid>
         <Grid size={{ xs: 12, md: 4 }} p={1}>
@@ -303,7 +303,7 @@ export default function Contact() {
                       <TableCell
                         sx={{ display: { xs: "none", md: "table-cell" } }}
                       >
-                        <Avatar src={row.profilePicture} alt={row.name} />
+                        <Avatar src={row.profilePicture as string} alt={row.name} />
                       </TableCell>
                       <TableCell>{row.name}</TableCell>
                       <TableCell>{row.contactInfo.email}</TableCell>
@@ -402,14 +402,14 @@ export default function Contact() {
         onClose={() => setOpenEdit(false)}
         onSubmit={handleEditContact}
         availableTags={tags}
-        initialData={selectedContact ?? undefined}
+        initialData={selectedContact as IContact}
       />
 
       <DeleteConfirmDialog
         open={openDelete}
         onClose={() => setOpenDelete(false)}
         onConfirm={handleDeleteContact}
-        contactName={selectedContact?.name}
+        contactName={selectedContact?.name || ''}
       />
 
       {/* Snackbar */}

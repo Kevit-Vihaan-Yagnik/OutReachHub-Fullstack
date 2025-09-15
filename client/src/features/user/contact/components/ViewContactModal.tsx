@@ -67,7 +67,7 @@ export default function ViewContactModal({
           >
             {/* Profile picture */}
             <Avatar
-              src={contact.profilePicture}
+              src={contact.profilePicture as string}
               alt={contact.name}
               sx={{ width: 80, height: 80 }}
             />

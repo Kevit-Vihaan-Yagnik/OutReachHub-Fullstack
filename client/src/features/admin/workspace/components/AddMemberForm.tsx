@@ -65,8 +65,12 @@ export default function AddMemberModal({
     try {
       const data = await file.arrayBuffer();
       const workbook = XLSX.read(data, { type: "array" });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rows: any[] = XLSX.utils.sheet_to_json(sheet);
+      const firstSheetName = workbook.SheetNames[0];
+      if (!firstSheetName) {
+        return;
+      }
+      const sheet = workbook.Sheets[firstSheetName];
+      const rows: any[] = XLSX.utils.sheet_to_json(sheet!);
 
       const members: IMemberToAdd[] = rows.map((row) => ({
         name: row["Name"],

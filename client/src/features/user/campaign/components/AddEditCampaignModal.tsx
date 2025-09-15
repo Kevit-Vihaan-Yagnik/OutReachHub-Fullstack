@@ -163,7 +163,7 @@ export default function AddEditCampaignModal({
               disabled={!isDraft}
               renderInput={(params) => (
                 <TextField
-                  {...params}
+                  {...params as any}
                   label="Select Template"
                   margin="normal"
                   fullWidth
@@ -214,7 +214,7 @@ export default function AddEditCampaignModal({
               }
               renderInput={(params) => (
                 <TextField
-                  {...params}
+                  {...params as any}
                   label="Select Tags"
                   margin="normal"
                   error={!!errors.tags}

@@ -160,7 +160,7 @@ export default function ViewWorkspaceModal({
       ...prev,
       [userId]: {
         ...prev[userId],
-        [key]: !prev[userId][key],
+        [key]: !prev[userId]?.[key],
       },
     }));
   };

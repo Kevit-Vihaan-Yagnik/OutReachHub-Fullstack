@@ -201,7 +201,7 @@ export default function Workspace() {
                         options={rows.map((row) => row.name)}
                         value={searchQuery}
                         onInputChange={(_, newValue) => setSearchQuery(newValue)}
-                        renderInput={(params) => <TextField {...params} label="Workspace" />}
+                        renderInput={(params) => <TextField {...params as any} label="Workspace" />}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }} p={1}>
