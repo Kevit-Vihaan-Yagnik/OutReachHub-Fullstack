@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-
+import BusinessIcon from '@mui/icons-material/Business';
+import EmailIcon from '@mui/icons-material/Email';
+import PhoneIcon from '@mui/icons-material/Phone';
 import {
   Avatar,
   Box,
@@ -11,6 +13,11 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Divider,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
   Typography,
 } from '@mui/material';
 
@@ -52,42 +59,64 @@ export default function ViewContactModal({ open, onClose, contactId }: ViewConta
       <DialogTitle>Contact Details</DialogTitle>
       <DialogContent dividers>
         {loading ? (
-          <Box display="flex" justifyContent="center" py={3}>
+          <Box display="flex" justifyContent="center" py={5}>
             <CircularProgress />
           </Box>
         ) : contact ? (
-          <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
-            {/* Profile picture */}
-            <Avatar
-              src={contact.profilePicture as string}
-              alt={contact.name}
-              sx={{ width: 80, height: 80 }}
-            />
-            {/* Name */}
-            <Typography variant="h6">{contact.name}</Typography>
-
-            {/* Email */}
-            <Typography variant="body1" color="text.secondary">
-              📧 {contact.contactInfo.email}
-            </Typography>
-
-            {/* Phone */}
-            <Typography variant="body1" color="text.secondary">
-              📞 {contact.contactInfo.countryCode} {contact.contactInfo.phoneNo}
-            </Typography>
-
-            {/* Company & Job */}
-            {contact.company && (
-              <Typography variant="body2">
-                🏢 {contact.company} - {contact.jobTitle}
+          <Box>
+            {/* Top section for Avatar and Name */}
+            <Box display="flex" flexDirection="column" alignItems="center" mb={2}>
+              <Avatar
+                src={contact.profilePicture as string}
+                alt={contact.name}
+                sx={{ width: 80, height: 80, mb: 2 }}
+              />
+              <Typography variant="h5" fontWeight={600}>
+                {contact.name}
               </Typography>
-            )}
+            </Box>
 
-            {/* Tags */}
-            <Box display="flex" gap={1} flexWrap="wrap" mt={1}>
-              {contact.tags.map((tag) => (
-                <Chip key={tag} label={tag} variant="outlined" />
-              ))}
+            <Divider sx={{ my: 2 }} />
+
+            {/* Details section using a List for clean alignment */}
+            <List dense>
+              <ListItem>
+                <ListItemIcon>
+                  <EmailIcon />
+                </ListItemIcon>
+                <ListItemText primary="Email" secondary={contact.contactInfo.email} />
+              </ListItem>
+              <ListItem>
+                <ListItemIcon>
+                  <PhoneIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Phone"
+                  secondary={`${contact.contactInfo.countryCode} ${contact.contactInfo.phoneNo}`}
+                />
+              </ListItem>
+              {contact.company && (
+                <ListItem>
+                  <ListItemIcon>
+                    <BusinessIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Company" secondary={`${contact.company} - ${contact.jobTitle}`} />
+                </ListItem>
+              )}
+            </List>
+
+            <Divider sx={{ my: 2 }} />
+
+            {/* Tags section */}
+            <Box>
+              <Typography variant="subtitle1" fontWeight={600} mb={1}>
+                Tags
+              </Typography>
+              <Box display="flex" gap={1} flexWrap="wrap">
+                {contact.tags.map((tag) => (
+                  <Chip key={tag} label={tag} variant="outlined" color="primary" />
+                ))}
+              </Box>
             </Box>
           </Box>
         ) : (

@@ -2,15 +2,16 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { Search } from '@mui/icons-material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {
   Alert,
-  Autocomplete,
   Avatar,
   Box,
   Button,
   Grid,
   IconButton,
+  InputAdornment,
   Menu,
   MenuItem,
   Paper,
@@ -28,6 +29,7 @@ import {
 } from '@mui/material';
 
 import type { RootState } from '@/app/store';
+import { useDebounce } from '@/utils/debouncer.util';
 
 import AddContactModal from './components/AddEditContactModal';
 import ContactFormModal from './components/AddEditContactModal';
@@ -66,26 +68,25 @@ export default function Contact() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredRows, setFilteredRows] = useState<IContact[]>([]);
+  const [filteredRows, setFilteredRows] = useState<IContact[]>(contacts);
   const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
   const [selectedContact, setSelectedContact] = useState<IContact | null>(null);
   const [openAdd, setOpenAdd] = useState(false);
   const [openView, setOpenView] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
-
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [menuRow, setMenuRow] = useState<IContact | null>(null);
   const openMenu = Boolean(anchorEl);
 
-  // Snackbar state
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
     severity: 'success' | 'error';
   }>({ open: false, message: '', severity: 'success' });
 
-  // 🔹 Fetch contacts from API on mount
   useEffect(() => {
     const fetchContacts = async () => {
       if (!workspaceId) return;
@@ -101,6 +102,17 @@ export default function Contact() {
     };
     fetchContacts();
   }, [workspaceId, dispatch]);
+
+  useEffect(() => {
+    const query = debouncedSearchQuery.trim();
+    if (!query) {
+      setFilteredRows(contacts);
+    } else {
+      const filtered = contacts.filter((c) => c.name.toLowerCase().includes(query.toLowerCase()));
+      setFilteredRows(filtered);
+    }
+    setPage(0);
+  }, [debouncedSearchQuery, contacts]);
 
   const handleChangePage = (_: unknown, newPage: number) => {
     setPage(newPage);
@@ -151,7 +163,7 @@ export default function Contact() {
       if (!workspaceId) return;
       const updated = await updateContactApi(workspaceId, selectedContact._id, data);
 
-      dispatch(updateContact(updated)); // 👈 you'll need an `updateContactInState` reducer in your slice
+      dispatch(updateContact(updated));
       setSnackbar({
         open: true,
         message: 'Contact updated successfully!',
@@ -194,8 +206,6 @@ export default function Contact() {
     }
   };
 
-  const visibleRows = filteredRows.length ? filteredRows : contacts;
-
   return (
     <Box
       sx={{
@@ -204,47 +214,46 @@ export default function Contact() {
         minHeight: '100vh',
       }}
     >
-      <Typography variant="h4" fontWeight={700} mb={3} color="primary">
-        Contacts
-      </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 3,
+          flexWrap: 'wrap',
+          gap: 2,
+        }}
+      >
+        <Typography variant="h4" fontWeight={700} mb={3} color="primary">
+          Contacts
+        </Typography>
+        {permission ? (
+          <Button variant="contained" onClick={() => setOpenAdd(true)}>
+            Add Contact+
+          </Button>
+        ) : (
+          ''
+        )}
+      </Box>
 
       {/* Top Filters */}
       <Grid container spacing={2} mb={3}>
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Autocomplete
-            disablePortal
-            options={contacts.map((c) => c.name)}
+          <TextField
+            fullWidth
+            size="medium"
+            label="Search by name..."
             value={searchQuery}
-            onInputChange={(_, newValue) => setSearchQuery(newValue)}
-            renderInput={(params) => (
-              <TextField {...(params as { size: string })} size="medium" label="Contact" />
-            )}
-          />
-        </Grid>
-        <Grid size={{ xs: 12, md: 4 }} p={1}>
-          <Button
-            variant="contained"
-            onClick={() => {
-              if (!searchQuery.trim()) {
-                setFilteredRows(contacts);
-              } else {
-                setFilteredRows(
-                  contacts.filter((c) => c.name.toLowerCase().includes(searchQuery.toLowerCase())),
-                );
-              }
-              setPage(0);
+            onChange={(e) => setSearchQuery(e.target.value)}
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="start">
+                    <Search />
+                  </InputAdornment>
+                ),
+              },
             }}
-          >
-            Search
-          </Button>
-          {permission ? (
-            <Button variant="contained" sx={{ ml: 2 }} onClick={() => setOpenAdd(true)}>
-              Add +
-            </Button>
-          ) : (
-            ''
-          )}
-        </Grid>
+          />
       </Grid>
 
       {/* Table */}
@@ -284,7 +293,7 @@ export default function Contact() {
                   </TableCell>
                 </TableRow>
               ) : (
-                visibleRows
+                filteredRows
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => (
                     <TableRow key={row._id} hover>
@@ -311,7 +320,8 @@ export default function Contact() {
         {/* Pagination */}
         <TablePagination
           component="div"
-          count={visibleRows.length}
+          // 6. Count is also based on `filteredRows`
+          count={filteredRows.length}
           page={page}
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
@@ -320,7 +330,7 @@ export default function Contact() {
         />
       </Paper>
 
-      {/* Action Menu */}
+      {/* Action Menu (no changes) ... */}
       <Menu anchorEl={anchorEl} open={openMenu} onClose={handleMenuClose}>
         <MenuItem
           onClick={() => {
@@ -364,7 +374,7 @@ export default function Contact() {
         )}
       </Menu>
 
-      {/* Modals */}
+      {/* Modals (no changes) ... */}
 
       <AddContactModal
         open={openAdd}
@@ -396,7 +406,7 @@ export default function Contact() {
         contactName={selectedContact?.name || ''}
       />
 
-      {/* Snackbar */}
+      {/* Snackbar (no changes) ... */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={4000}

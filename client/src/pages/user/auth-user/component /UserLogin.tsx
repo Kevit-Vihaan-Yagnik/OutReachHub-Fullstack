@@ -104,17 +104,6 @@ const UserLogin = () => {
           User Login
         </Typography>
 
-        {errors.email && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {errors.email.message}
-          </Alert>
-        )}
-        {errors.password && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {errors.password.message}
-          </Alert>
-        )}
-
         <TextField
           fullWidth
           label="Email"

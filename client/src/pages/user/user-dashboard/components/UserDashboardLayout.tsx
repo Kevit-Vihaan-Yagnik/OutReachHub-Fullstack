@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { Campaign, Contacts, Message } from '@mui/icons-material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -41,6 +41,7 @@ interface Props {
 export default function UserDashboardLayout({ children }: Props) {
   const theme = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const workspaceName = useSelector((state: RootState) => state.userAuth.currentWorkspace?.name);
   const dispatch = useDispatch();
@@ -80,6 +81,17 @@ export default function UserDashboardLayout({ children }: Props) {
     navigate('/user/login');
   };
 
+  const navItems = [
+    { text: 'Dashboard', icon: <DashboardIcon color="primary" />, path: '/user/dashboard' },
+    { text: 'Contacts', icon: <Contacts color="primary" />, path: '/user/dashboard/contacts' },
+    {
+      text: 'Message Templates',
+      icon: <Message color="primary" />,
+      path: '/user/dashboard/templates',
+    },
+    { text: 'Campaigns', icon: <Campaign color="primary" />, path: '/user/dashboard/campaigns' },
+  ];
+
   const drawer = (
     <Box>
       <Toolbar>
@@ -89,30 +101,20 @@ export default function UserDashboardLayout({ children }: Props) {
       </Toolbar>
       <Divider />
       <List>
-        <ListItemButton onClick={() => navigate('/user/dashboard')}>
-          <ListItemIcon>
-            <DashboardIcon color="primary" />
-          </ListItemIcon>
-          <ListItemText primary="Dashboard" />
-        </ListItemButton>
-        <ListItemButton onClick={() => navigate('/user/dashboard/contacts')}>
-          <ListItemIcon>
-            <Contacts color="primary" />
-          </ListItemIcon>
-          <ListItemText primary="Contacts" />
-        </ListItemButton>
-        <ListItemButton onClick={() => navigate('/user/dashboard/templates')}>
-          <ListItemIcon>
-            <Message color="primary" />
-          </ListItemIcon>
-          <ListItemText primary="Message Templates" />
-        </ListItemButton>
-        <ListItemButton onClick={() => navigate('/user/dashboard/campaigns')}>
-          <ListItemIcon>
-            <Campaign color="primary" />
-          </ListItemIcon>
-          <ListItemText primary="Campaigns" />
-        </ListItemButton>
+        {navItems.map((item) => (
+          <ListItemButton
+            key={item.text}
+            selected={
+              item.path === '/user/dashboard'
+                ? location.pathname === item.path
+                : location.pathname.startsWith(item.path)
+            }
+            onClick={() => navigate(item.path)}
+          >
+            <ListItemIcon>{item.icon}</ListItemIcon>
+            <ListItemText primary={item.text} />
+          </ListItemButton>
+        ))}
         <ListItemButton onClick={handleLogout}>
           <ListItemIcon>
             <LogoutIcon color="error" />
