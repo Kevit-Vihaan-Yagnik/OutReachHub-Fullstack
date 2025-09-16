@@ -2,8 +2,8 @@ import axios, { AxiosError } from 'axios';
 import type { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import { store } from '@/app/store';
-import { logout, setTokens } from '@/features/admin/auth/slices/adminAuthSlice';
-import { userLogout, userSetTokens } from '@/features/user/auth-user/slices/userAuthSlice';
+import { logout, setTokens } from '@/pages/admin/auth/slices/adminAuthSlice';
+import { userLogout, userSetTokens } from '@/pages/user/auth-user/slices/userAuthSlice';
 
 // Base URL for API (configurable based on environment)
 const BASE_URL = import.meta.env.VITE_API_URL;

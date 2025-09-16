@@ -3,18 +3,18 @@ import { useSelector } from 'react-redux';
 import { Navigate, RouterProvider, createBrowserRouter } from 'react-router-dom';
 
 import type { RootState } from '@/app/store';
-import Home from '@/features/admin/admin-dashboard/components/Home';
-import Workspace from '@/features/admin/workspace/components/Workspace';
-import Campaign from '@/features/user/campaign/components/Campaign';
-import Contact from '@/features/user/contact/components/Contact';
-import MessageTemplate from '@/features/user/message-template/components/MessageTemplate';
-import UserHome from '@/features/user/user-dashboard/components/UserHome';
-import WorkspacePicker from '@/features/user/user-dashboard/components/WorkspacePicker';
-import LoginAdmin from '@/pages/AdminLogin.Page';
-import DashboardPage from '@/pages/Dashboard.Page';
-import Landing from '@/pages/Landing.Page';
-import UserDashboardPage from '@/pages/UserDashboard.Page';
-import LoginUser from '@/pages/UserLogin.Page';
+import DashboardPage from '@/pages/admin/admin-dashboard';
+import Home from '@/pages/admin/admin-dashboard/components/Home';
+import LoginAdmin from '@/pages/admin/auth';
+import Workspace from '@/pages/admin/workspace';
+import Landing from '@/pages/landing-page';
+import LoginUser from '@/pages/user/auth-user';
+import Campaign from '@/pages/user/campaign';
+import Contact from '@/pages/user/contact';
+import MessageTemplate from '@/pages/user/message-template';
+import UserDashboardPage from '@/pages/user/user-dashboard';
+import UserHome from '@/pages/user/user-dashboard/components/UserHome';
+import WorkspacePicker from '@/pages/user/user-dashboard/components/WorkspacePicker';
 
 function CatchAllRedirect() {
   const admin = useSelector((state: RootState) => state.adminAuth.admin?.access_token);
