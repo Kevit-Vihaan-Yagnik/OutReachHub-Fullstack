@@ -1,11 +1,12 @@
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-import { Alert, Box, Button, Snackbar, TextField, Typography, useTheme } from '@mui/material';
+import { Box, Button, TextField, Typography, useTheme } from '@mui/material';
 
 import { yupResolver } from '@hookform/resolvers/yup';
+
+import { showSnackbar } from '@/common/slices/snackbarSlice';
 
 import { adminLogin } from '../service/auth.service';
 import { login } from '../slices/adminAuthSlice';
@@ -13,8 +14,6 @@ import { type LoginFormData, schema } from '../types';
 
 const AdminLogin = () => {
   const theme = useTheme();
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [errorSnackbar, setErrorSnackbar] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -43,11 +42,11 @@ const AdminLogin = () => {
           refresh_token: res.refresh_token,
         }),
       );
-      setOpenSnackbar(true);
+      dispatch(showSnackbar({ message: 'Login successful!', severity: 'success' }));
       navigate('/admin/dashboard');
     } catch (error) {
       console.error('Login failed:', error);
-      setErrorSnackbar(true);
+      dispatch(showSnackbar({ message: 'Login failed. Please try again.', severity: 'error' }));
       reset();
     }
   };
@@ -104,17 +103,6 @@ const AdminLogin = () => {
           Admin Login
         </Typography>
 
-        {errors.email && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {errors.email.message}
-          </Alert>
-        )}
-        {errors.password && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {errors.password.message}
-          </Alert>
-        )}
-
         <TextField
           fullWidth
           label="Email"
@@ -157,27 +145,6 @@ const AdminLogin = () => {
           Login
         </Button>
       </Box>
-
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={3000}
-        onClose={() => setOpenSnackbar(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: '100%' }}>
-          Login successful 🎉
-        </Alert>
-      </Snackbar>
-      <Snackbar
-        open={errorSnackbar}
-        autoHideDuration={3000}
-        onClose={() => setErrorSnackbar(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert onClose={() => setErrorSnackbar(false)} severity="error" sx={{ width: '100%' }}>
-          Login Failed
-        </Alert>
-      </Snackbar>
     </Box>
   );
 };

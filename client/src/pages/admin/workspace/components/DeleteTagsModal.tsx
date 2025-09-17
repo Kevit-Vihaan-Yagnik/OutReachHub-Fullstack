@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 import DeleteIcon from '@mui/icons-material/Delete';
 import {
@@ -14,6 +15,8 @@ import {
   ListItemText,
 } from '@mui/material';
 
+import { showSnackbar } from '@/common/slices/snackbarSlice';
+
 import { deleteTags, getWorkspaceById } from '../service/workspace.service';
 import type { IWorkspace } from '../types';
 
@@ -21,8 +24,7 @@ interface DeleteTagsModalProps {
   open: boolean;
   onClose: () => void;
   workspaceId: string;
-  onSuccess: () => void; // refresh parent
-  showSnackbar: (msg: string, severity?: 'success' | 'error') => void;
+  onSuccess: () => void;
 }
 
 export default function DeleteTagsModal({
@@ -30,10 +32,10 @@ export default function DeleteTagsModal({
   onClose,
   workspaceId,
   onSuccess,
-  showSnackbar,
 }: DeleteTagsModalProps) {
   const [workspace, setWorkspace] = useState<IWorkspace | null>(null);
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const fetchWorkspace = useCallback(async () => {
     try {
@@ -41,11 +43,11 @@ export default function DeleteTagsModal({
       const res = await getWorkspaceById(workspaceId);
       setWorkspace(res);
     } catch {
-      showSnackbar('Failed to fetch workspace tags', 'error');
+      dispatch(showSnackbar({ message: 'Failed to fetch workspace tags', severity: 'error' }));
     } finally {
       setLoading(false);
     }
-  }, [workspaceId, showSnackbar]);
+  }, [workspaceId, dispatch]);
 
   useEffect(() => {
     if (open && workspaceId) {
@@ -56,11 +58,16 @@ export default function DeleteTagsModal({
   const handleDelete = async (tag: string) => {
     try {
       const res = (await deleteTags(workspaceId, { tags: [tag] })) as { message: string };
-      showSnackbar(res.message || `Tag "${tag}" deleted successfully!`);
+      dispatch(
+        showSnackbar({
+          message: res.message || `Tag "${tag}" deleted successfully!`,
+          severity: 'success',
+        }),
+      );
       fetchWorkspace();
       onSuccess();
     } catch {
-      showSnackbar('Failed to delete tag', 'error');
+      dispatch(showSnackbar({ message: 'Failed to delete tag', severity: 'error' }));
     }
   };
 

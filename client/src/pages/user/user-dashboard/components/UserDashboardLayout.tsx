@@ -25,6 +25,7 @@ import {
 } from '@mui/material';
 
 import type { RootState } from '@/app/store';
+import { showSnackbar } from '@/common/slices/snackbarSlice';
 import { userLogout } from '@/pages/user/auth-user/slices/userAuthSlice';
 
 import { userLogoutApi } from '../../auth-user/service/userAuth.service';
@@ -78,6 +79,7 @@ export default function UserDashboardLayout({ children }: Props) {
     }
     dispatch(userLogout());
     dispatch(clearUserWorkspace());
+    dispatch(showSnackbar({ message: 'Logged out successfully', severity: 'success' }));
     navigate('/user/login');
   };
 
@@ -104,11 +106,7 @@ export default function UserDashboardLayout({ children }: Props) {
         {navItems.map((item) => (
           <ListItemButton
             key={item.text}
-            selected={
-              item.path === '/user/dashboard'
-                ? location.pathname === item.path
-                : location.pathname.startsWith(item.path)
-            }
+            selected={item.path === location.pathname}
             onClick={() => navigate(item.path)}
           >
             <ListItemIcon>{item.icon}</ListItemIcon>

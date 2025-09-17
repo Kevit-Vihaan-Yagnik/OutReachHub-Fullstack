@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {
-  Alert,
   Autocomplete,
   Box,
   Button,
@@ -12,7 +11,6 @@ import {
   Menu,
   MenuItem,
   Paper,
-  Snackbar,
   Table,
   TableBody,
   TableCell,
@@ -26,6 +24,7 @@ import {
 } from '@mui/material';
 
 import type { RootState } from '@/app/store';
+import { showSnackbar } from '@/common/slices/snackbarSlice';
 
 import AddMemberModal from './components/AddMemberForm';
 import AddTagsModal from './components/AddTagsForm';
@@ -67,21 +66,6 @@ export default function Workspace() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredRows, setFilteredRows] = useState<IWorkspaceRow[]>([]);
 
-  // Snackbar state
-  const [snackbar, setSnackbar] = useState<{
-    open: boolean;
-    message: string;
-    severity: 'success' | 'error';
-  }>({
-    open: false,
-    message: '',
-    severity: 'success',
-  });
-
-  const showSnackbar = (message: string, severity: 'success' | 'error' = 'success') => {
-    setSnackbar({ open: true, message, severity });
-  };
-
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [menuRow, setMenuRow] = useState<IWorkspaceRow | null>(null);
   const openMenu = Boolean(anchorEl);
@@ -111,9 +95,9 @@ export default function Workspace() {
     try {
       const newWs = await createWorkspace(data);
       dispatch(addWorkspace(newWs));
-      showSnackbar('Workspace created successfully!');
+      dispatch(showSnackbar({ message: 'Workspace created successfully!', severity: 'success' }));
     } catch {
-      showSnackbar('Failed to create workspace', 'error');
+      dispatch(showSnackbar({ message: 'Failed to create workspace', severity: 'error' }));
     }
   };
 
@@ -123,9 +107,14 @@ export default function Workspace() {
       await addMembers(data, workspaceId);
       const res = await workspaces();
       dispatch(setWorkspaces(res));
-      showSnackbar('Member added successfully!');
+      dispatch(showSnackbar({ message: 'Member added successfully!', severity: 'success' }));
     } catch {
-      showSnackbar('Failed to add member , Member already exists', 'error');
+      dispatch(
+        showSnackbar({
+          message: 'Failed to add member , Member already exists',
+          severity: 'error',
+        }),
+      );
     }
   };
 
@@ -144,9 +133,14 @@ export default function Workspace() {
         };
         dispatch(updateWorkspace(updated));
       }
-      showSnackbar(res.message || 'Workspace updated successfully!');
+      dispatch(
+        showSnackbar({
+          message: res.message || 'Workspace updated successfully!',
+          severity: 'success',
+        }),
+      );
     } catch {
-      showSnackbar('Failed to update workspace', 'error');
+      dispatch(showSnackbar({ message: 'Failed to update workspace', severity: 'error' }));
     }
   };
 
@@ -157,10 +151,10 @@ export default function Workspace() {
       // refresh workspaces
       const res = await workspaces();
       dispatch(setWorkspaces(res));
-      showSnackbar('Tags added successfully!');
+      dispatch(showSnackbar({ message: 'Tags added successfully!', severity: 'success' }));
     } catch (err) {
       console.error('Failed to add tags:', err);
-      showSnackbar('Failed to add tags', 'error');
+      dispatch(showSnackbar({ message: 'Failed to add tags', severity: 'error' }));
     }
   };
 
@@ -326,7 +320,6 @@ export default function Workspace() {
             const res = await workspaces();
             dispatch(setWorkspaces(res));
           }}
-          showSnackbar={showSnackbar}
         />
         <DeleteTagsModal
           open={openDeleteTags}
@@ -336,7 +329,6 @@ export default function Workspace() {
             const res = await workspaces();
             dispatch(setWorkspaces(res));
           }}
-          showSnackbar={showSnackbar}
         />
         <ViewWorkspaceModal
           open={openView}
@@ -411,22 +403,6 @@ export default function Workspace() {
           Delete Tags
         </MenuItem>
       </Menu>
-
-      {/* Snackbar */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      >
-        <Alert
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-          severity={snackbar.severity}
-          sx={{ width: '100%' }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 }

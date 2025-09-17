@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Search } from '@mui/icons-material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {
-  Alert,
   Avatar,
   Box,
   Button,
@@ -15,7 +14,6 @@ import {
   Menu,
   MenuItem,
   Paper,
-  Snackbar,
   Table,
   TableBody,
   TableCell,
@@ -29,6 +27,7 @@ import {
 } from '@mui/material';
 
 import type { RootState } from '@/app/store';
+import { showSnackbar } from '@/common/slices/snackbarSlice';
 import { useDebounce } from '@/utils/debouncer.util';
 
 import AddContactModal from './components/AddEditContactModal';
@@ -80,12 +79,6 @@ export default function Contact() {
   const openMenu = Boolean(anchorEl);
 
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
-
-  const [snackbar, setSnackbar] = useState<{
-    open: boolean;
-    message: string;
-    severity: 'success' | 'error';
-  }>({ open: false, message: '', severity: 'success' });
 
   useEffect(() => {
     const fetchContacts = async () => {
@@ -141,18 +134,10 @@ export default function Contact() {
     try {
       const newContact = await addContactToWorkspace(workspaceId, data);
       dispatch(addContact(newContact));
-      setSnackbar({
-        open: true,
-        message: 'Contact added successfully!',
-        severity: 'success',
-      });
+      dispatch(showSnackbar({ message: 'Contact added successfully!', severity: 'success' }));
     } catch (err) {
       console.error('❌ Failed to add contact:', err);
-      setSnackbar({
-        open: true,
-        message: 'Contact already exists',
-        severity: 'error',
-      });
+      dispatch(showSnackbar({ message: 'Contact already exists', severity: 'error' }));
     }
   };
 
@@ -164,18 +149,10 @@ export default function Contact() {
       const updated = await updateContactApi(workspaceId, selectedContact._id, data);
 
       dispatch(updateContact(updated));
-      setSnackbar({
-        open: true,
-        message: 'Contact updated successfully!',
-        severity: 'success',
-      });
+      dispatch(showSnackbar({ message: 'Contact updated successfully!', severity: 'success' }));
     } catch {
       dispatch(setError('Failed to update Contact'));
-      setSnackbar({
-        open: true,
-        message: 'Failed to update contact',
-        severity: 'error',
-      });
+      dispatch(showSnackbar({ message: 'Failed to update contact', severity: 'error' }));
     } finally {
       setOpenEdit(false);
     }
@@ -188,18 +165,10 @@ export default function Contact() {
       const message = await deleteContactApi(workspaceId, selectedContact._id);
       dispatch(deleteContact(selectedContact._id));
 
-      setSnackbar({
-        open: true,
-        message,
-        severity: 'success',
-      });
+      dispatch(showSnackbar({ message, severity: 'success' }));
     } catch {
       dispatch(setError('Failed to delete contact'));
-      setSnackbar({
-        open: true,
-        message: 'Failed to delete contact',
-        severity: 'error',
-      });
+      dispatch(showSnackbar({ message: 'Failed to delete contact', severity: 'error' }));
     } finally {
       setOpenDelete(false);
       setSelectedContact(null);
@@ -211,7 +180,6 @@ export default function Contact() {
       sx={{
         p: 3,
         backgroundColor: theme.palette.background.default,
-        minHeight: '100vh',
       }}
     >
       <Box
@@ -224,12 +192,12 @@ export default function Contact() {
           gap: 2,
         }}
       >
-        <Typography variant="h4" fontWeight={700} mb={3} color="primary">
+        <Typography variant="h4" fontWeight={700} color="primary">
           Contacts
         </Typography>
         {permission ? (
           <Button variant="contained" onClick={() => setOpenAdd(true)}>
-            Add Contact+
+            Add Contact +
           </Button>
         ) : (
           ''
@@ -238,22 +206,22 @@ export default function Contact() {
 
       {/* Top Filters */}
       <Grid container spacing={2} mb={3}>
-          <TextField
-            fullWidth
-            size="medium"
-            label="Search by name..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="start">
-                    <Search />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
+        <TextField
+          fullWidth
+          size="small"
+          label="Search by name..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="start">
+                  <Search />
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
       </Grid>
 
       {/* Table */}
@@ -405,22 +373,6 @@ export default function Contact() {
         onConfirm={handleDeleteContact}
         contactName={selectedContact?.name || ''}
       />
-
-      {/* Snackbar (no changes) ... */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={4000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      >
-        <Alert
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-          severity={snackbar.severity}
-          sx={{ width: '100%' }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 }

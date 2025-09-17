@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+
 import BusinessIcon from '@mui/icons-material/Business';
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
@@ -100,7 +101,10 @@ export default function ViewContactModal({ open, onClose, contactId }: ViewConta
                   <ListItemIcon>
                     <BusinessIcon />
                   </ListItemIcon>
-                  <ListItemText primary="Company" secondary={`${contact.company} - ${contact.jobTitle}`} />
+                  <ListItemText
+                    primary="Company"
+                    secondary={`${contact.company} - ${contact.jobTitle}`}
+                  />
                 </ListItem>
               )}
             </List>

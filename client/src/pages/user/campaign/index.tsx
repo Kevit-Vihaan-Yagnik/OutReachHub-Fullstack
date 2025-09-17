@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {
-  Alert,
   Box,
   Button,
   Chip,
@@ -14,7 +13,6 @@ import {
   MenuItem,
   Paper,
   Select,
-  Snackbar,
   Table,
   TableBody,
   TableCell,
@@ -31,6 +29,7 @@ import {
 import { format } from 'date-fns';
 
 import type { RootState } from '@/app/store';
+import { showSnackbar } from '@/common/slices/snackbarSlice';
 
 import AddEditFormaModal from './components/AddEditCampaignModal';
 import DeleteCampaignModal from './components/DeleteCampaignModal';
@@ -69,20 +68,6 @@ export default function CampaignTable() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedCampaign, setSelectedCampaign] = useState<ICampaign | null>(null);
 
-  const [snackbar, setSnackbar] = useState<{
-    open: boolean;
-    message: string;
-    severity: 'success' | 'error';
-  }>({
-    open: false,
-    message: '',
-    severity: 'success',
-  });
-
-  const handleCloseSnackbar = () => {
-    setSnackbar((prev) => ({ ...prev, open: false }));
-  };
-
   const dispatch = useDispatch();
   const { campaigns } = useSelector((state: RootState) => state.campaign);
   const workspaceId = useSelector((state: RootState) => state.userAuth.currentWorkspace?.id);
@@ -102,11 +87,7 @@ export default function CampaignTable() {
     try {
       if (!workspaceId) {
         console.error('❌ No workspaceId found');
-        setSnackbar({
-          open: true,
-          message: 'Workspace not found!',
-          severity: 'error',
-        });
+        dispatch(showSnackbar({ message: 'No workspaceId found', severity: 'error' }));
         return;
       }
 
@@ -116,20 +97,12 @@ export default function CampaignTable() {
 
       fetchCampaigns();
 
-      setSnackbar({
-        open: true,
-        message: '✅ Campaign created successfully!',
-        severity: 'success',
-      });
+      dispatch(showSnackbar({ message: '✅ Campaign created successfully!', severity: 'success' }));
 
       setOpenAdd(false);
     } catch (err) {
       console.error('❌ Failed to create campaign:', err);
-      setSnackbar({
-        open: true,
-        message: '❌ Failed to create campaign',
-        severity: 'error',
-      });
+      dispatch(showSnackbar({ message: '❌ Failed to create campaign', severity: 'error' }));
     }
   };
 
@@ -148,18 +121,15 @@ export default function CampaignTable() {
       // Update Redux with new campaign state
       dispatch(updateCampaign(mappedCampaign));
       fetchCampaigns();
-      setSnackbar({
-        open: true,
-        message: res.message || '✅ Campaign started successfully!',
-        severity: 'success',
-      });
+      dispatch(
+        showSnackbar({
+          message: res.message || '✅ Campaign started successfully!',
+          severity: 'success',
+        }),
+      );
     } catch (err) {
       console.error('❌ Failed to start campaign:', err);
-      setSnackbar({
-        open: true,
-        message: '❌ Failed to start campaign',
-        severity: 'error',
-      });
+      dispatch(showSnackbar({ message: '❌ Failed to start campaign', severity: 'error' }));
     } finally {
       setStartingId(null);
     }
@@ -170,20 +140,12 @@ export default function CampaignTable() {
     try {
       const updated = await updateCampaignApi(editingCampaign._id, workspaceId, data);
       dispatch(updateCampaign(updated));
-      setSnackbar({
-        open: true,
-        message: '✅ Campaign updated successfully!',
-        severity: 'success',
-      });
+      dispatch(showSnackbar({ message: '✅ Campaign updated successfully!', severity: 'success' }));
       setOpenEdit(false);
       fetchCampaigns();
       setEditingCampaign(null);
     } catch (err) {
-      setSnackbar({
-        open: true,
-        message: '❌ Failed to update campaign',
-        severity: 'error',
-      });
+      dispatch(showSnackbar({ message: '❌ Failed to update campaign', severity: 'error' }));
       console.error('❌ Failed to update campaign:', err);
     }
   };
@@ -193,20 +155,12 @@ export default function CampaignTable() {
     try {
       await deleteCampaignApi(deletingCampaign._id, workspaceId); // ✅ your API service
       dispatch(deleteCampaign(deletingCampaign._id)); // ✅ update redux
-      setSnackbar({
-        open: true,
-        message: '✅ Campaign deleted successfully',
-        severity: 'success',
-      });
+      dispatch(showSnackbar({ message: '✅ Campaign deleted successfully', severity: 'success' }));
       setOpenDelete(false);
       setDeletingCampaign(null);
     } catch (err) {
       console.error('❌ Failed to delete campaign:', err);
-      setSnackbar({
-        open: true,
-        message: '❌ Failed to delete campaign',
-        severity: 'error',
-      });
+      dispatch(showSnackbar({ message: '❌ Failed to delete campaign', severity: 'error' }));
     }
   };
 
@@ -287,7 +241,7 @@ export default function CampaignTable() {
           gap: 2,
         }}
       >
-        <Typography variant="h4" fontWeight={700}>
+        <Typography variant="h4" fontWeight={700} color="primary">
           Campaigns
         </Typography>
         {permission ? (
@@ -455,18 +409,6 @@ export default function CampaignTable() {
           campaignName={deletingCampaign?.name || ''}
         />
 
-        {/* Snackbar */}
-        <Snackbar
-          open={snackbar.open}
-          autoHideDuration={4000}
-          onClose={handleCloseSnackbar}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        >
-          <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
-            {snackbar.message}
-          </Alert>
-        </Snackbar>
-
         {/* Pagination */}
         <TablePagination
           component="div"
@@ -501,12 +443,20 @@ export default function CampaignTable() {
                 if (selectedCampaign?.status === 'Draft') {
                   setEditingCampaign(selectedCampaign);
                   setOpenEdit(true);
+                } else if (selectedCampaign?.status === 'Running') {
+                  dispatch(
+                    showSnackbar({
+                      message: 'Campaign already in running mode!',
+                      severity: 'error',
+                    }),
+                  );
                 } else {
-                  setSnackbar({
-                    open: true,
-                    message: 'Campaign already in running mode!',
-                    severity: 'error',
-                  });
+                  dispatch(
+                    showSnackbar({
+                      message: 'Completed campaign cannot be edited!',
+                      severity: 'error',
+                    }),
+                  );
                 }
                 handleMenuClose();
               }}
@@ -518,12 +468,20 @@ export default function CampaignTable() {
                 if (selectedCampaign?.status === 'Draft') {
                   setDeletingCampaign(selectedCampaign);
                   setOpenDelete(true);
+                } else if (selectedCampaign?.status === 'Running') {
+                  dispatch(
+                    showSnackbar({
+                      message: 'Campaign already in running mode!',
+                      severity: 'error',
+                    }),
+                  );
                 } else {
-                  setSnackbar({
-                    open: true,
-                    message: 'Campaign already in running mode!',
-                    severity: 'error',
-                  });
+                  dispatch(
+                    showSnackbar({
+                      message: 'Completed campaign cannot be deleted!',
+                      severity: 'error',
+                    }),
+                  );
                 }
                 handleMenuClose();
               }}

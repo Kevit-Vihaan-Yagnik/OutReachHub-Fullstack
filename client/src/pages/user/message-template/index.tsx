@@ -1,10 +1,8 @@
-// MessageTemplate.tsx
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Masonry from '@mui/lab/Masonry';
 import {
-  Alert,
   Box,
   Button,
   Card,
@@ -12,7 +10,6 @@ import {
   CardContent,
   CardMedia,
   Pagination,
-  Snackbar,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
@@ -21,6 +18,7 @@ import {
 } from '@mui/material';
 
 import type { RootState } from '@/app/store';
+import { showSnackbar } from '@/common/slices/snackbarSlice';
 
 import AddTemplateModal from './components/AddTemplate';
 import DeleteTemplateModal from './components/DeleteTemplateModal';
@@ -48,12 +46,6 @@ export default function MessageTemplate() {
   const permission = useSelector(
     (state: RootState) => state.userAuth.currentWorkspace?.permission.editor,
   );
-
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: '',
-    severity: 'success' as 'success' | 'error',
-  });
   const [openAdd, setOpenAdd] = useState(false);
 
   const [viewOpen, setViewOpen] = useState(false);
@@ -75,18 +67,11 @@ export default function MessageTemplate() {
     try {
       const newTemplate = await createMessageTemplate(workspaceId, data);
       dispatch(addMessageTemplate(newTemplate));
-      setSnackbar({
-        open: true,
-        message: 'Template added successfully!',
-        severity: 'success',
-      });
+
+      dispatch(showSnackbar({ message: 'Template added successfully!', severity: 'success' }));
     } catch (err) {
       console.error('❌ Failed to add template:', err);
-      setSnackbar({
-        open: true,
-        message: 'Failed to add template',
-        severity: 'error',
-      });
+      dispatch(showSnackbar({ message: 'Failed to add template', severity: 'error' }));
     }
   };
 
@@ -96,18 +81,10 @@ export default function MessageTemplate() {
     try {
       await deleteMessageTemplateApi(workspaceId, templateId);
       dispatch(deleteMessageTemplate(templateId)); // ✅ create this reducer in slice
-      setSnackbar({
-        open: true,
-        message: 'Template deleted successfully!',
-        severity: 'success',
-      });
+      dispatch(showSnackbar({ message: 'Template deleted successfully!', severity: 'success' }));
     } catch (err) {
       console.error('❌ Failed to delete template:', err);
-      setSnackbar({
-        open: true,
-        message: 'Failed to delete template',
-        severity: 'error',
-      });
+      dispatch(showSnackbar({ message: 'Failed to delete template', severity: 'error' }));
     } finally {
       setDeleteOpen(false);
       setDeleteTemplate(null);
@@ -295,22 +272,6 @@ export default function MessageTemplate() {
         template={deleteTemplate}
         onConfirm={handleDeleteTemplate}
       />
-
-      {/* Snackbar */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={4000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert
-          severity={snackbar.severity}
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-          sx={{ width: '100%' }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
 
       {/* Pagination */}
       {totalPages > 1 && (

@@ -5,6 +5,7 @@ import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 
 import { Router } from './app/router';
 import { store } from './app/store';
+import GlobalSnackbar from './common/components/GlobalSnackbar';
 
 interface ThemeContextType {
   mode: 'dark';
@@ -41,6 +42,7 @@ const App = () => {
         <Provider store={store}>
           <CssBaseline />
           <Router />
+          <GlobalSnackbar />
         </Provider>
       </ThemeProvider>
     </ThemeContext.Provider>

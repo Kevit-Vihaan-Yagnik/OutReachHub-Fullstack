@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 import DeleteIcon from '@mui/icons-material/Delete';
 import {
@@ -21,6 +22,8 @@ import {
   Typography,
 } from '@mui/material';
 
+import { showSnackbar } from '@/common/slices/snackbarSlice';
+
 import { deleteMember, getWorkspaceById } from '../service/workspace.service';
 import type { IWorkspace } from '../types';
 
@@ -29,7 +32,6 @@ interface DeleteMembersModalProps {
   onClose: () => void;
   workspaceId: string;
   onSuccess: () => void; // refresh parent
-  showSnackbar: (msg: string, severity?: 'success' | 'error') => void;
 }
 
 export default function DeleteMembersModal({
@@ -37,7 +39,6 @@ export default function DeleteMembersModal({
   onClose,
   workspaceId,
   onSuccess,
-  showSnackbar,
 }: DeleteMembersModalProps) {
   const [workspace, setWorkspace] = useState<IWorkspace | null>(null);
   const [loading, setLoading] = useState(false);
@@ -46,6 +47,7 @@ export default function DeleteMembersModal({
   const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [selectedUserName, setSelectedUserName] = useState<string>('');
+  const dispatch = useDispatch();
 
   const fetchWorkspace = useCallback(async () => {
     if (!workspaceId) return;
@@ -55,11 +57,11 @@ export default function DeleteMembersModal({
       const res = await getWorkspaceById(workspaceId);
       setWorkspace(res);
     } catch {
-      showSnackbar('Failed to fetch workspace members', 'error');
+      dispatch(showSnackbar({ message: 'Failed to fetch workspace details', severity: 'error' }));
     } finally {
       setLoading(false);
     }
-  }, [workspaceId, showSnackbar]);
+  }, [workspaceId, dispatch]);
 
   useEffect(() => {
     if (open && workspaceId) {
@@ -77,11 +79,16 @@ export default function DeleteMembersModal({
     if (!selectedUserId) return;
     try {
       const res = await deleteMember(workspaceId, selectedUserId);
-      showSnackbar(res.message || 'Member deleted successfully!');
+      dispatch(
+        showSnackbar({
+          message: res.message || 'Member deleted successfully!',
+          severity: 'success',
+        }),
+      );
       fetchWorkspace();
       onSuccess();
     } catch {
-      showSnackbar('Failed to delete member', 'error');
+      dispatch(showSnackbar({ message: 'Failed to delete member', severity: 'error' }));
     } finally {
       setConfirmOpen(false);
       setSelectedUserId(null);
@@ -104,11 +111,16 @@ export default function DeleteMembersModal({
         }
       }
 
-      showSnackbar('All eligible members deleted successfully!');
+      dispatch(
+        showSnackbar({
+          message: 'All eligible members deleted successfully!',
+          severity: 'success',
+        }),
+      );
       fetchWorkspace();
       onSuccess();
     } catch {
-      showSnackbar('Failed to delete all members', 'error');
+      dispatch(showSnackbar({ message: 'Failed to delete all members', severity: 'error' }));
     } finally {
       setBulkConfirmOpen(false);
     }

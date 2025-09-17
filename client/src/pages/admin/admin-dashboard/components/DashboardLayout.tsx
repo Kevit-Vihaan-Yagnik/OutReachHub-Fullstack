@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { Workspaces } from '@mui/icons-material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -23,6 +23,7 @@ import {
 } from '@mui/material';
 
 import type { RootState } from '@/app/store';
+import { showSnackbar } from '@/common/slices/snackbarSlice';
 import { logout } from '@/pages/admin/auth/slices/adminAuthSlice';
 
 const drawerWidth = 240;
@@ -34,6 +35,7 @@ interface Props {
 export default function DashboardLayout({ children }: Props) {
   const theme = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const dispatch = useDispatch();
   const handleDrawerToggle = () => {
@@ -43,8 +45,15 @@ export default function DashboardLayout({ children }: Props) {
 
   const handleLogout = () => {
     dispatch(logout());
+    dispatch(showSnackbar({ message: 'Logged out successfully', severity: 'success' }));
     navigate('/admin/login');
   };
+
+  const navItems = [
+    { text: 'Dashboard', icon: <DashboardIcon color="primary" />, path: '/admin/dashboard' },
+    { text: 'Workspace', icon: <Workspaces color="primary" />, path: '/admin/dashboard/workspace' },
+    { text: 'Logout', icon: <LogoutIcon color="error" />, action: handleLogout },
+  ];
 
   const drawer = (
     <Box>
@@ -55,24 +64,16 @@ export default function DashboardLayout({ children }: Props) {
       </Toolbar>
       <Divider />
       <List>
-        <ListItemButton onClick={() => navigate('/admin/dashboard')}>
-          <ListItemIcon>
-            <DashboardIcon color="primary" />
-          </ListItemIcon>
-          <ListItemText primary="Dashboard" />
-        </ListItemButton>
-        <ListItemButton onClick={() => navigate('/admin/dashboard/workspace')}>
-          <ListItemIcon>
-            <Workspaces color="primary" />
-          </ListItemIcon>
-          <ListItemText primary="Workspace" />
-        </ListItemButton>
-        <ListItemButton onClick={handleLogout}>
-          <ListItemIcon>
-            <LogoutIcon color="error" />
-          </ListItemIcon>
-          <ListItemText primary="Logout" />
-        </ListItemButton>
+        {navItems.map((item, index) => (
+          <ListItemButton
+            key={index}
+            selected={location.pathname === item.path}
+            onClick={() => (item.action ? item.action() : navigate(item.path))}
+          >
+            <ListItemIcon>{item.icon}</ListItemIcon>
+            <ListItemText primary={item.text} />
+          </ListItemButton>
+        ))}
       </List>
     </Box>
   );

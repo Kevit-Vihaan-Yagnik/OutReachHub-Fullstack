@@ -1,11 +1,12 @@
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-import { Alert, Box, Button, Snackbar, TextField, Typography, useTheme } from '@mui/material';
+import { Box, Button, TextField, Typography, useTheme } from '@mui/material';
 
 import { yupResolver } from '@hookform/resolvers/yup';
+
+import { showSnackbar } from '@/common/slices/snackbarSlice';
 
 import { userLoginApi } from '../service/userAuth.service';
 import { userLogin } from '../slices/userAuthSlice';
@@ -13,8 +14,6 @@ import { type ILoginFormData, schema } from '../types';
 
 const UserLogin = () => {
   const theme = useTheme();
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [errorSnackbar, setErrorSnackbar] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -43,11 +42,11 @@ const UserLogin = () => {
           refresh_token: res.refresh_token,
         }),
       );
-      setOpenSnackbar(true);
+      dispatch(showSnackbar({ message: 'Login successful!', severity: 'success' }));
       navigate('/user/workspace-picker');
     } catch (error) {
       console.error('Login failed:', error);
-      setErrorSnackbar(true);
+      dispatch(showSnackbar({ message: 'Login failed. Please try again.', severity: 'error' }));
       reset();
     }
   };
@@ -146,27 +145,6 @@ const UserLogin = () => {
           Login
         </Button>
       </Box>
-
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={3000}
-        onClose={() => setOpenSnackbar(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: '100%' }}>
-          Login successful 🎉
-        </Alert>
-      </Snackbar>
-      <Snackbar
-        open={errorSnackbar}
-        autoHideDuration={3000}
-        onClose={() => setErrorSnackbar(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert onClose={() => setErrorSnackbar(false)} severity="error" sx={{ width: '100%' }}>
-          Login Failed
-        </Alert>
-      </Snackbar>
     </Box>
   );
 };

@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 
+import snackbarReducer from '@/common/slices/snackbarSlice';
 import adminAuthReducer from '@/pages/admin/auth/slices/adminAuthSlice';
 import adminWorkspaceReducer from '@/pages/admin/workspace/slices/workspaceAdminSlice';
 import userAuthReducer from '@/pages/user/auth-user/slices/userAuthSlice';
@@ -17,6 +18,7 @@ export const store = configureStore({
     userWorkspace: userWorkspaceReducer,
     messageTemplate: messageTemplateReducer,
     campaign: campaingReducer,
+    snackbar: snackbarReducer,
   },
 });
 
